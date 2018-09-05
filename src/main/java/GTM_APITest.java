@@ -24,15 +24,17 @@
 	import com.google.api.client.json.gson.GsonFactory;
 	import com.google.api.client.util.store.FileDataStoreFactory;
 	import com.google.api.services.tagmanager.TagManager;
-	import com.google.api.services.tagmanager.TagManagerScopes;
-	import com.google.api.services.tagmanager.model.Condition;
+import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
+import com.google.api.services.tagmanager.TagManagerScopes;
+import com.google.api.services.tagmanager.model.Account;
+import com.google.api.services.tagmanager.model.Condition;
 	import com.google.api.services.tagmanager.model.Container;
 	import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
 	public class GTM_APITest {
 		
 		  // Path to client_secrets.json file downloaded from the Developer's Console.
-		  // The path is relative to GoogleTagManager.java.
+		  // The path is relative to GTM_APITest.java.
 		  private static final String CLIENT_SECRET_JSON_RESOURCE = "client_secrets.json";
 
 		  // The directory where the user's credentials will be stored for the application.
@@ -40,7 +42,7 @@
 		  		"\n" + 
 		  		"");
 
-		  private static final String Google_Tag_Manager = "GoogleTagManager";
+		  private static final String Google_Tag_Manager = "GTM_APITest";
 		  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 		  private static NetHttpTransport httpTransport;
 		  private static FileDataStoreFactory dataStoreFactory;
@@ -63,6 +65,16 @@
 		      // Find the Greg_Pina_Test container.
 		      Container Greg_Pina_Test = findContainer(manager, accountId);
 		      String containerId = Greg_Pina_Test.getContainerId();
+		      
+		      
+		      // Find the example container
+		      Container Test_Container = findContainer(manager, "56800");
+		      String TestcontainerId = Test_Container.getContainerId();
+		      
+			      TagManager.Accounts.Get Test = new TagManager.Accounts().get(TestcontainerId);
+			      String Test_Account = new Account().getAccountId();
+		      
+		     
 		      
 		      /*
 		       * Return example container (as object)
@@ -89,7 +101,7 @@
 		private static Credential authorize() throws Exception {
 		    // Load client secrets.
 		    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-		        new InputStreamReader(GoogleTagManager.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
+		        new InputStreamReader(GTM_APITest.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
 
 		    // Set up authorization code flow for all auth scopes.
 		    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
@@ -110,17 +122,16 @@
 		   * @return the Greg_Pina_Test container if it exists.
 		   *
 		   */
+			static String API_Container = "Greg_Pina_Test_Container";
+		
 		  private static Container findContainer(TagManager service, String accountId)
 		      throws Exception {
 		    for (Container container :
 		        service.accounts().containers().list(accountId).execute().getContainer()) {
-		      if (container.getName().equals("Greg_Pina")) {
+		      if (container.getName().equals(API_Container)) {
 		        return container;
 		      }
 		    }
-		    throw new IllegalArgumentException("No container named Greg_Pina in given account");
+		    throw new IllegalArgumentException("No container named" + API_Container + "in given account");
 		  }
-		}
-		      
-
-}
+	}
