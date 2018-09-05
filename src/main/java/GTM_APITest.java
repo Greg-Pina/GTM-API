@@ -24,13 +24,15 @@
 	import com.google.api.client.json.gson.GsonFactory;
 	import com.google.api.client.util.store.FileDataStoreFactory;
 	import com.google.api.services.tagmanager.TagManager;
-import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
-import com.google.api.services.tagmanager.TagManagerScopes;
-import com.google.api.services.tagmanager.model.Account;
-import com.google.api.services.tagmanager.model.Condition;
+	import com.google.api.services.tagmanager.TagManager.Accounts;
+	import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
+	import com.google.api.services.tagmanager.TagManagerScopes;
+	import com.google.api.services.tagmanager.model.Account;
+	import com.google.api.services.tagmanager.model.Condition;
 	import com.google.api.services.tagmanager.model.Container;
 	import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
+	import com.google.api.services.tagmanager.model.Workspace;
 	public class GTM_APITest {
 		
 		  // Path to client_secrets.json file downloaded from the Developer's Console.
@@ -59,20 +61,23 @@ import com.google.api.services.tagmanager.model.Condition;
 		      TagManager manager = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
 		          .setApplicationName(Google_Tag_Manager).build();
 
-		      // Get tag manager account ID.
+		      // Get tag manager account ID for Project.
 		      String accountId = "3982950028";
 
-		      // Find the Greg_Pina_Test container.
-		      Container Greg_Pina_Test = findContainer(manager, accountId);
-		      String containerId = Greg_Pina_Test.getContainerId();
+		      // Find the Greg_Pina_Test Project container.
+		      Container Greg_Pina_Test = findProjectContainer(manager, accountId);
+		      String ProjectcontainerId = Greg_Pina_Test.getContainerId();
 		      
+		      // Get GTM account ID for example container
+		      String ExampleAccountId = "56800";
 		      
 		      // Find the example container
-		      Container Test_Container = findContainer(manager, "56800");
-		      String TestcontainerId = Test_Container.getContainerId();
+		      Container Example_Container = findTestContainer(manager, ExampleAccountId);
+		      String ExampleContainerId = Example_Container.getContainerId();
+		      Workspace Example_Workspace = 
 		      
-			      
-		      
+		      //This pulls the tags from example container
+
 			      
 		      
 		      /*
@@ -121,16 +126,57 @@ import com.google.api.services.tagmanager.model.Condition;
 		   * @return the Greg_Pina_Test container if it exists.
 		   *
 		   */
-			static String API_Container = "Greg_Pina_Test_Container";
 		
-		  private static Container findContainer(TagManager service, String accountId)
+		  private static Container findProjectContainer(TagManager service, String ProjectcontainerId)
 		      throws Exception {
 		    for (Container container :
-		        service.accounts().containers().list(accountId).execute().getContainer()) {
-		      if (container.getName().equals(API_Container)) {
+		        service.accounts().containers().list(ProjectcontainerId).execute().getContainer()) {
+		      if (container.getName().equals("Greg_Pina_Test_Container")) {
 		        return container;
 		      }
 		    }
-		    throw new IllegalArgumentException("No container named" + API_Container + "in given account");
+		    throw new IllegalArgumentException("No container named Greg_Pina_Test_Container in given account");
+		  }
+		  
+		  /*
+		   * Find the Example container ID.
+		   *
+		   * @param service the Tag Manager service object.
+		   * @param accountId the ID of the Tag Manager account from which to retrieve the
+		   *    Greetings container.
+		   *
+		   * @return the greetings container if it exists.
+		   *
+		   */
+		  private static Container findTestContainer(TagManager service, String ExampleContainerId)
+		      throws Exception {
+		    for (Container container :
+		        service.accounts().containers().list(ExampleContainerId).execute().getContainer()) {
+		      if (container.getContainerId().equals("98189")) {
+		        return container;
+		      }
+		    }
+		    throw new IllegalArgumentException("No container with that ID in given account");
+		  }
+		  
+		  /*
+		   * Find the Example Workspace ID.
+		   *
+		   * @param service the Tag Manager service object.
+		   * @param accountId the ID of the Tag Manager account from which to retrieve the
+		   *    Greetings container.
+		   *
+		   * @return the greetings container if it exists.
+		   *
+		   */
+		  private static Tag FindTestTags(TagManager service, String accountId)
+		      throws Exception {
+		    for (Tag TestTag :
+		        service.accounts().containers().workspaces().tags().list(accountId).execute().getTag()) {
+		      if (TestTag.getTagId().equals("4")) {
+		        return TestTag;
+		      }
+		    }
+		    throw new IllegalArgumentException("No with that ID in given account");
 		  }
 	}
