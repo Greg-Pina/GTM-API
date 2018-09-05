@@ -71,8 +71,7 @@ import com.google.api.services.tagmanager.model.Condition;
 		      Container Test_Container = findContainer(manager, "56800");
 		      String TestcontainerId = Test_Container.getContainerId();
 		      
-			      TagManager.Accounts.Get Test =  TagManager.accounts().
-			      String Test_Account = new Account().getAccountId();
+			      
 		      
 			      
 		      
