@@ -74,7 +74,11 @@
 		      // Find the example container
 		      Container Example_Container = findTestContainer(manager, ExampleAccountId);
 		      String ExampleContainerId = Example_Container.getContainerId();
-		      Workspace Example_Workspace = 
+		      List<String> wowCharacters = new ArrayList<String>();
+		      wowCharacters.stream().map(x-> x + "something");
+		      wowCharacters.stream().filter(hero-> !hero.equals("Thrall") );
+		     
+		      
 		      
 		      //This pulls the tags from example container
 
@@ -158,6 +162,32 @@
 		    }
 		    throw new IllegalArgumentException("No container with that ID in given account");
 		  }
+		  
+		  private static List<Account> getAccountList(TagManager service)
+			      throws Exception 
+		   {
+		        return service.accounts().list().execute().getAccount(); 
+		   }
+		  
+		  private static List<Container> getContainerList(TagManager service)
+			      throws Exception 
+		   {
+		        
+			  List<Account> accountList = getAccountList(service);
+			  List<Container> containerList = new ArrayList<Container>(); 
+			  
+			  for(Account a : accountList)
+			  {
+				  List<Container> currList = service.accounts().containers().list(a.getAccountId()).execute().getContainer();
+				  for(Container c : currList)
+				  {
+					  containerList.add(c);
+				  }
+				  
+			  }
+			  
+			  return containerList; 	   
+		   }
 		  
 		  /*
 		   * Find the Example Workspace ID.
