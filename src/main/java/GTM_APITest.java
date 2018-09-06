@@ -26,13 +26,15 @@
 	import com.google.api.services.tagmanager.TagManager;
 	import com.google.api.services.tagmanager.TagManager.Accounts;
 	import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
-	import com.google.api.services.tagmanager.TagManagerScopes;
+import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces;
+import com.google.api.services.tagmanager.TagManagerScopes;
 	import com.google.api.services.tagmanager.model.Account;
 	import com.google.api.services.tagmanager.model.Condition;
 	import com.google.api.services.tagmanager.model.Container;
 	import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
-	import com.google.api.services.tagmanager.model.Workspace;
+import com.google.api.services.tagmanager.model.UserPermission;
+import com.google.api.services.tagmanager.model.Workspace;
 	public class GTM_APITest {
 		
 		  // Path to client_secrets.json file downloaded from the Developer's Console.
@@ -40,7 +42,7 @@
 		  private static final String CLIENT_SECRET_JSON_RESOURCE = "client_secrets.json";
 
 		  // The directory where the user's credentials will be stored for the application.
-		  private static final File DATA_STORE_DIR = new File("/Users/Greg/eclipse-workspace/Google_Tag_Manager/src/main/java/client_secrets.json\n" + 
+		  private static final File DATA_STORE_DIR = new File("/Users/Greg/eclipse-workspace/GregPina-APITestRepo/src/main/java/client_secrets.json\n" + 
 		  		"\n" + 
 		  		"");
 
@@ -78,11 +80,13 @@
 		      wowCharacters.stream().map(x-> x + "something");
 		      wowCharacters.stream().filter(hero-> !hero.equals("Thrall") );
 		     
+		      List<Workspace> wsList = new ArrayList<Workspace>();
 		      
 		      
 		      //This pulls the tags from example container
 
 			      
+		      getTagList(manager);
 		      
 		      /*
 		       * Return example container (as object)
@@ -105,7 +109,16 @@
 		      e.printStackTrace();
 		    }
 		  }
-
+		  
+		  
+		private static List<UserPermission> getUP(TagManager service, String accountId)
+			throws Exception
+		{
+			List<UserPermission> UPList = new ArrayList<UserPermission>();
+			
+			return UPList
+		}
+		  
 		private static Credential authorize() throws Exception {
 		    // Load client secrets.
 		    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
@@ -169,6 +182,21 @@
 		        return service.accounts().list().execute().getAccount(); 
 		   }
 		  
+		  private static List<Workspaces> getWorkspaceList(TagManager service)
+		  			throws Exception
+		  			{
+			  			List<Account> Listaccount = getAccountList(service);
+			  			List<Container> containerList = new ArrayList<Container>();
+			  			List<Workspace> workspaceList = new ArrayList<Workspace>();
+			  			
+			  			for(Account account: Listaccount)
+			  			{
+			  				List<Workspace> currentList = service.accounts().containers().workspaces().list(account.getAccountId()).execute().getWorkspace();
+			  			}
+			  			
+			  			return service.accounts().containers().workspaces().list(a.getAccountID()).execute().getWorkspace();
+		  			}
+		  
 		  private static List<Container> getContainerList(TagManager service)
 			      throws Exception 
 		   {
@@ -182,12 +210,27 @@
 				  for(Container c : currList)
 				  {
 					  containerList.add(c);
+					  containerList.toArray();
+				  }
+				  
+				  List<Tag> nextList = service.accounts().containers().workspaces().tags().list(a.getAccountId()).execute().getTag();
+				  for(Tag tag : nextList ) 
+				  {
+					  nextList.add(tag);
 				  }
 				  
 			  }
 			  
+			  
 			  return containerList; 	   
 		   }
+		  
+		  private static List<Tag> getTagList(TagManager service)
+		  		throws Exception
+		  		{
+			  		return service.accounts().containers().workspaces().tags().list("92").execute().getTag();
+		  		}
+		  
 		  
 		  /*
 		   * Find the Example Workspace ID.
