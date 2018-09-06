@@ -169,7 +169,7 @@
 		   * @return the greetings container if it exists.
 		   *
 		   */
-		  private static Tag FindTestTags(TagManager service, String accountId)
+		  private static Tag findExampleWorkspace(TagManager service, String accountId)
 		      throws Exception {
 		    for (Tag TestTag :
 		        service.accounts().containers().workspaces().tags().list(accountId).execute().getTag()) {
