@@ -31,7 +31,9 @@ import com.google.api.services.tagmanager.TagManagerScopes;
 	import com.google.api.services.tagmanager.model.Account;
 	import com.google.api.services.tagmanager.model.Condition;
 	import com.google.api.services.tagmanager.model.Container;
-	import com.google.api.services.tagmanager.model.Parameter;
+import com.google.api.services.tagmanager.model.ListContainerVersionsResponse;
+import com.google.api.services.tagmanager.model.ListContainersResponse;
+import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
 import com.google.api.services.tagmanager.model.UserPermission;
 import com.google.api.services.tagmanager.model.Workspace;
@@ -52,9 +54,133 @@ import com.google.api.services.tagmanager.model.Workspace;
 		  private static FileDataStoreFactory dataStoreFactory;
 
 		  public static void main(String[] args) {
-		    try {
-		    	
+			  try {
+			      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+			      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
 
+			      // Authorization flow.
+			      Credential credential = authorize();
+			      TagManager manager = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
+			          .setApplicationName("GTM_APITest").build();
+			    } catch (Exception e) {
+			      e.printStackTrace();
+			    }
+			    
+			// Get tag manager account ID for Project.
+		      String accountId = "3982950028";
+		      
+		      // Get GTM account ID for example container
+		      String ExampleAccountId = "56800";
+		      
+		      TagManager tm = 
+		      
+		      
+		      System.out.println();findProjectContainer(manager , "3982950028"));
+			  
+			 
+}			
+		  private static Container findProjectContainer(TagManager service, String ProjectcontainerId)
+			      throws Exception {
+			    for (Container container :
+			        service.accounts().containers().list(ProjectcontainerId).execute().getContainer()) {
+			      if (container.getName().equals("Greg_Pina_Test_Container")) {
+			        return container;
+			      }
+			    }
+			    throw new IllegalArgumentException("No container in given account");
+			  }  
+			  
+
+			  private static Credential authorize() throws Exception {
+			    // Load client secrets.
+			    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+			        new InputStreamReader(GTM_APITest.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
+
+			    // Set up authorization code flow for all auth scopes.
+			    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
+			        JSON_FACTORY, clientSecrets, TagManagerScopes.all()).setDataStoreFactory(dataStoreFactory)
+			        .build();
+
+			    // Authorize.
+			    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+			  }
+			  
+			  
+			  private static List<Account> getAccountList(TagManager service, String accountId)
+				      throws Exception 
+			   {
+			        return service.accounts().list().execute().getAccount(); 
+			   }
+			  private static List<Container> getContainerList(TagManager service, String accountId)
+				      throws Exception 
+			   {
+			        
+				  List<Account> accountList = getAccountList(service, accountId);
+				  List<Container> containerList = new ArrayList<Container>(); 
+				  
+				  for(Account a : accountList)
+				  {
+					  List<Container> currList = service.accounts().containers().list(a.getAccountId()).execute().getContainer();
+					  for(Container c : currList)
+					  {
+						  containerList.add(c);
+						  containerList.toArray();
+					  }
+					  
+					  List<Tag> nextList = service.accounts().containers().workspaces().tags().list(a.getAccountId()).execute().getTag();
+					  for(Tag tag : nextList ) 
+					  {
+						  nextList.add(tag);
+					  }
+					  
+				  }
+				  return containerList; 	   
+			   }
+			  
+			  private static List<Tag> getTagList(TagManager service, String tagId)
+			  		throws Exception
+	  		   {
+		  		   return service.accounts().containers().workspaces().tags().list(tagId).execute().getTag();
+	  		   }
+			  
+			  private static List<Workspace> getWorkspaceList(TagManager service, String workspaceId)
+	  			throws Exception
+	  			{
+		  			List<Account> Listaccount = getAccountList(service, workspaceId);
+		  			List<Container> containerList = new ArrayList<Container>();
+		  			List<Workspace> workspaceList = new ArrayList<Workspace>();
+		  			
+		  			for(Account account: Listaccount)
+		  			{
+		  				List<Workspace> currentList = service.accounts().containers().workspaces().list(account.getAccountId()).execute().getWorkspace();
+		  			}
+		  			
+		  			return workspaceList;
+	  			}
+	}
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+		    	
+/*
 		      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
 
@@ -103,7 +229,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 		       *    
 		       *    
 		       *    
-		       */
+		       *
 
 		    } catch (Exception e) {
 		      e.printStackTrace();
@@ -116,7 +242,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 		{
 			List<UserPermission> UPList = new ArrayList<UserPermission>();
 			
-			return UPList
+			return UPList;
 		}
 		  
 		private static Credential authorize() throws Exception {
@@ -142,7 +268,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 		   *
 		   * @return the Greg_Pina_Test container if it exists.
 		   *
-		   */
+		   *
 		
 		  private static Container findProjectContainer(TagManager service, String ProjectcontainerId)
 		      throws Exception {
@@ -164,7 +290,9 @@ import com.google.api.services.tagmanager.model.Workspace;
 		   *
 		   * @return the greetings container if it exists.
 		   *
-		   */
+		   *
+		   *
+		   *
 		  private static Container findTestContainer(TagManager service, String ExampleContainerId)
 		      throws Exception {
 		    for (Container container :
@@ -241,7 +369,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 		   *
 		   * @return the greetings container if it exists.
 		   *
-		   */
+		   *
 		  private static Tag findExampleWorkspace(TagManager service, String accountId)
 		      throws Exception {
 		    for (Tag TestTag :
@@ -252,4 +380,9 @@ import com.google.api.services.tagmanager.model.Workspace;
 		    }
 		    throw new IllegalArgumentException("No with that ID in given account");
 		  }
-	}
+	} *
+	
+	
+	
+	
+	*/
