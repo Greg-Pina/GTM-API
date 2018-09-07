@@ -65,31 +65,42 @@ import com.google.api.services.tagmanager.model.Workspace;
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
-			    
+			/**   
+			 * 
+			 * Project info
+			 *  
+			 **/
 			// Get tag manager account ID for Project.
-		      String accountId = "3982950028";
+		      String ProjectAccountID = "3982950028";
 		      
-		      // Get GTM account ID for example container
+		      // Get GTM Container ID for Project
+		      String ProjectContainerID = "9814638";
+		      
+		      // Get GTM Workspace ID for Project
+		      String ProjectWorkspaceID = "5";
+		      
+		      
+		      /**   
+				 * 
+				 * Example info
+				 *  
+				 **/
+		      // Get GTM account ID for example 
 		      String ExampleAccountId = "56800";
 		      
-		      TagManager tm = 
+		      // Get GTM Container ID for example
+		      String ExampleContainerId = "98189";
+		      
+		      // Get GTM Workspace ID for example
+		      String ExampleWorkspaceID = "92";
 		      
 		      
-		      System.out.println();findProjectContainer(manager , "3982950028"));
+		      
+		      
+		      
 			  
 			 
-}			
-		  private static Container findProjectContainer(TagManager service, String ProjectcontainerId)
-			      throws Exception {
-			    for (Container container :
-			        service.accounts().containers().list(ProjectcontainerId).execute().getContainer()) {
-			      if (container.getName().equals("Greg_Pina_Test_Container")) {
-			        return container;
-			      }
-			    }
-			    throw new IllegalArgumentException("No container in given account");
-			  }  
-			  
+}			  
 
 			  private static Credential authorize() throws Exception {
 			    // Load client secrets.
@@ -106,16 +117,16 @@ import com.google.api.services.tagmanager.model.Workspace;
 			  }
 			  
 			  
-			  private static List<Account> getAccountList(TagManager service, String accountId)
+			  private static List<Account> getAccountList(TagManager service, String ProjectaccountId)
 				      throws Exception 
 			   {
 			        return service.accounts().list().execute().getAccount(); 
 			   }
-			  private static List<Container> getContainerList(TagManager service, String accountId)
+			  
+			  private static List<Container> getContainerList(TagManager service, String AccountID)
 				      throws Exception 
 			   {
-			        
-				  List<Account> accountList = getAccountList(service, accountId);
+				  List<Account> accountList = getAccountList(service, AccountID);
 				  List<Container> containerList = new ArrayList<Container>(); 
 				  
 				  for(Account a : accountList)
