@@ -31,6 +31,7 @@ import com.google.api.services.tagmanager.TagManagerScopes;
 	import com.google.api.services.tagmanager.model.Account;
 	import com.google.api.services.tagmanager.model.Condition;
 	import com.google.api.services.tagmanager.model.Container;
+import com.google.api.services.tagmanager.model.ListAccountsResponse;
 import com.google.api.services.tagmanager.model.ListContainerVersionsResponse;
 import com.google.api.services.tagmanager.model.ListContainersResponse;
 import com.google.api.services.tagmanager.model.Parameter;
@@ -44,11 +45,9 @@ import com.google.api.services.tagmanager.model.Workspace;
 		  private static final String CLIENT_SECRET_JSON_RESOURCE = "client_secrets.json";
 
 		  // The directory where the user's credentials will be stored for the application.
-		  private static final File DATA_STORE_DIR = new File("/Users/Greg/eclipse-workspace/GregPina-APITestRepo/src/main/java/client_secrets.json\n" + 
-		  		"\n" + 
-		  		"");
+		  private static final File DATA_STORE_DIR = new File("/Users/Greg/eclipse-workspace/GregPina-APITestRepo/src/main/java/");
 
-		  private static final String Google_Tag_Manager = "GTM_APITest";
+		  private static final String APPLICATION_NAME = "GTM_APITest";
 		  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 		  private static NetHttpTransport httpTransport;
 		  private static FileDataStoreFactory dataStoreFactory;
@@ -61,45 +60,53 @@ import com.google.api.services.tagmanager.model.Workspace;
 			      // Authorization flow.
 			      Credential credential = authorize();
 			      TagManager manager = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
-			          .setApplicationName("GTM_APITest").build();
+			          .setApplicationName(APPLICATION_NAME).build();
+			      
+			      /**   
+					 * 
+					 * Project info
+					 *  
+					 **/
+					// Get tag manager account ID for Project.
+				      String ProjectAccountID = "3982950028";
+				      
+				      // Get GTM Container ID for Project
+				      String ProjectContainerID = "9814638";
+				      
+				      // Get GTM Workspace ID for Project
+				      String ProjectWorkspaceID = "5";
+				      
+				      
+				      /**   
+						 * 
+						 * Example info
+						 *  
+						 **/
+				      // Get GTM account ID for example 
+				      String ExampleAccountId = "56800";
+				      
+				      // Get GTM Container ID for example
+				      String ExampleContainerId = "98189";
+				      
+				      // Get GTM Workspace ID for example
+				      String ExampleWorkspaceID = "92";
+				      
+				      
+				      
+				      Container example = findGreetingsContainer(manager, ExampleAccountId, ExampleContainerId);
+				      
+				      /**
+				      List<Account> Project = getAccountList(manager, ProjectAccountID);
+				      List<Container> ProjectContainer = getContainerList(manager, ProjectAccountID);
+				      List<Workspace> ProjectWorkspace = getWorkspaceList(manager, ProjectContainerID, ProjectAccountID);
+				      **/
+				      
+			      
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
-			/**   
-			 * 
-			 * Project info
-			 *  
-			 **/
-			// Get tag manager account ID for Project.
-		      String ProjectAccountID = "3982950028";
-		      
-		      // Get GTM Container ID for Project
-		      String ProjectContainerID = "9814638";
-		      
-		      // Get GTM Workspace ID for Project
-		      String ProjectWorkspaceID = "5";
-		      
-		      
-		      /**   
-				 * 
-				 * Example info
-				 *  
-				 **/
-		      // Get GTM account ID for example 
-		      String ExampleAccountId = "56800";
-		      
-		      // Get GTM Container ID for example
-		      String ExampleContainerId = "98189";
-		      
-		      // Get GTM Workspace ID for example
-		      String ExampleWorkspaceID = "92";
-		      
-		      
-		      
-		      
-		      
+			
 			  
-			 
 }			  
 
 			  private static Credential authorize() throws Exception {
@@ -150,11 +157,11 @@ import com.google.api.services.tagmanager.model.Workspace;
 			  
 
 			  
-			  private static List<Workspace> getWorkspaceList(TagManager service, String workspaceId, String accountId)
+			  private static List<Workspace> getWorkspaceList(TagManager service, String containerId, String accountId)
 	  			throws Exception
 	  			{
-		  			List<Account> Listaccount = getAccountList(service, workspaceId);
-		  			List<Container> containerList = getContainerList(service, accountId);
+		  			List<Account> Listaccount = getAccountList(service, accountId);
+		  			List<Container> containerList = getContainerList(service, containerId);
 		  			List<Workspace> workspaceList = new ArrayList<Workspace>();
 		  			
 		  			for(Account account: Listaccount)
@@ -170,12 +177,12 @@ import com.google.api.services.tagmanager.model.Workspace;
 		  			return workspaceList;
 	  			}
 			  
-			  private static List<Tag> getTagList(TagManager service, String tagId, String workspaceId, String accountId)
+			  private static List<Tag> getTagList(TagManager service, String containerId, String workspaceId, String accountId)
 				  		throws Exception
 		  		   {
-			  		   List<Account> AccList = getAccountList(service, workspaceId);
+			  		   List<Account> AccList = getAccountList(service, accountId);
 			  		   List<Container> ContainList = getContainerList(service, accountId);
-			  		   List<Workspace> WSList = getWorkspaceList(service, workspaceId, accountId);
+			  		   List<Workspace> WSList = getWorkspaceList(service, containerId, accountId);
 			  		   List<Tag> TagList = new ArrayList<Tag>();
 			  		   
 			  		   for(Tag tag : TagList)
@@ -198,6 +205,18 @@ import com.google.api.services.tagmanager.model.Workspace;
 						
 						return UPList;
 					}
+			  
+			  private static Container findGreetingsContainer(TagManager service, String accountId, String containerId)
+				      throws Exception {
+				    for (Container container :
+				        service.accounts().containers().list(accountId).execute().getContainer()) {
+				      if (container.getContainerId().equals(containerId)) {
+				        return container;
+				      }
+				    }
+				    throw new IllegalArgumentException("No container named Greetings in given account");
+				  }
+				    
 	}
 		    	
 		    	
