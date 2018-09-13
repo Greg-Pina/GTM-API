@@ -8,7 +8,8 @@
 	import java.io.InputStreamReader;
 	import java.util.ArrayList;
 	import java.util.Arrays;
-	import java.util.List;
+import java.util.Iterator;
+import java.util.List;
 
 	import org.apache.commons.codec.language.bm.Rule;
 
@@ -37,7 +38,9 @@
 	import com.google.api.services.tagmanager.model.ListContainerVersionsResponse;
 	import com.google.api.services.tagmanager.model.ListContainersResponse;
 	import com.google.api.services.tagmanager.model.ListTagsResponse;
-	import com.google.api.services.tagmanager.model.Parameter;
+import com.google.api.services.tagmanager.model.ListTriggersResponse;
+import com.google.api.services.tagmanager.model.ListVariablesResponse;
+import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
 	import com.google.api.services.tagmanager.model.UserPermission;
 	import com.google.api.services.tagmanager.model.Workspace;
@@ -80,12 +83,7 @@
 				      // Get GTM Workspace ID for Project
 				      String ProjectWorkspaceID = "5";
 				      
-				      
-				      /**   
-						 * 
-						 * Example info
-						 *  
-						 **/
+
 				      // Get GTM account ID for example 
 				      String ExampleAccountId = "56800";
 				      
@@ -95,10 +93,38 @@
 				      // Get GTM Workspace ID for example
 				      String ExampleWorkspaceID = "92";
 				      
-				     Container container = manager.accounts().containers().get("accounts/3982950028/containers/9814638").execute();
-				     ListTagsResponse  TagList = manager.accounts().containers().workspaces().tags().list("accounts/56800/containers/98189/workspaces/92").execute();
+				      
+				      // Info from example account
+				     Container EXcontainer = manager.accounts().containers().get("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId).execute();
+				     ListTagsResponse  EXTagList = manager.accounts().containers().workspaces().tags().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
+				     ListVariablesResponse EXVariableList = manager.accounts().containers().workspaces().variables().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
+				     ListTriggersResponse EXTriggerList = manager.accounts().containers().workspaces().triggers().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
 				     
-				     System.out.println(TagList);
+				     // Info from project account
+				     Container Projcontainer = manager.accounts().containers().get("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID).execute();
+
+				     
+				    for(Tag tag : EXTagList.getTag())
+				    {
+				    	
+				    	System.out.println(tag);
+				    }
+				     
+				    
+				     /*
+				     System.out.println(TagList.getTag());
+				     System.out.println("");
+				     System.out.println(VariableList.getVariable());
+				     System.out.println("");
+				     System.out.println(TriggerList.getTrigger());
+				     System.out.println("");
+				     System.out.println(container.getName());
+				     System.out.println("");
+				     
+				     */
+				     
+				     
+				     
 				     
 				      /**
 				      List<Account> Project = getAccountList(manager, ProjectAccountID);
@@ -126,77 +152,6 @@
 			    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("GA Support");
 			  }
 			  
-			  
-			  private static List<Account> getAccountList(TagManager service, String ProjectaccountId)
-				      throws Exception 
-			   {
-			        return service.accounts().list().execute().getAccount(); 
-			   }
-			  
-			  private static List<Container> getContainerList(TagManager service, String AccountID)
-				      throws Exception 
-			   {
-				  List<Account> accountList = getAccountList(service, AccountID);
-				  List<Container> containerList = new ArrayList<Container>(); 
-				  
-				  for(Account a : accountList)
-				  {
-					  List<Container> currList = service.accounts().containers().list(a.getAccountId()).execute().getContainer();
-					  for(Container c : currList)
-					  {
-						  containerList.add(c);
-						  containerList.toArray();
-					  }
-					  
-					  List<Tag> nextList = service.accounts().containers().workspaces().tags().list(a.getAccountId()).execute().getTag();
-					  for(Tag tag : nextList ) 
-					  {
-						  nextList.add(tag);
-					  }
-					  
-				  }
-				  return containerList; 	   
-			   }
-			  
-
-			  
-			  private static List<Workspace> getWorkspaceList(TagManager service, String containerId, String accountId)
-	  			throws Exception
-	  			{
-		  			List<Account> Listaccount = getAccountList(service, accountId);
-		  			List<Container> containerList = getContainerList(service, containerId);
-		  			List<Workspace> workspaceList = new ArrayList<Workspace>();
-		  			
-		  			for(Account account: Listaccount)
-		  			{
-		  				List<Workspace> currentList = service.accounts().containers().workspaces().list(account.getAccountId()).execute().getWorkspace();
-		  				for (Workspace ws : currentList) 
-		  				{
-		  					workspaceList.add(ws);
-		  					workspaceList.stream();
-		  					workspaceList.toArray();
-		  				}
-		  			}
-		  			
-		  			return workspaceList;
-	  			}
-			  
-			  private static List<Tag> getTagList(TagManager service, String containerId, String workspaceId, String accountId)
-				  		throws Exception
-		  		   {
-			  		   List<Tag> TagList = new ArrayList<Tag>();
-			  		   
-			  		   for(Tag tag : TagList)
-			  		   {
-			  			   List<Tag> TList = service.accounts().containers().workspaces().tags().list(tag.getTagId()).execute().getTag();
-			  			   for( Tag t : TList)
-			  			   {
-			  				   TagList.stream();
-			  			   }
-			  		   }
-			  		   
-			  		   return TagList;
-		  		   }
 				    
 	}
 		    	
