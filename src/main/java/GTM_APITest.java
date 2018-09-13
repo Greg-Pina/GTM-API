@@ -25,19 +25,23 @@
 	import com.google.api.client.util.store.FileDataStoreFactory;
 	import com.google.api.services.tagmanager.TagManager;
 	import com.google.api.services.tagmanager.TagManager.Accounts;
+	import com.google.api.services.tagmanager.TagManager.Accounts.Containers;
 	import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
-import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces;
-import com.google.api.services.tagmanager.TagManagerScopes;
+	import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces;
+	import com.google.api.services.tagmanager.TagManagerScopes;
 	import com.google.api.services.tagmanager.model.Account;
 	import com.google.api.services.tagmanager.model.Condition;
+	import com.google.api.services.tagmanager.model.Trigger;
 	import com.google.api.services.tagmanager.model.Container;
-import com.google.api.services.tagmanager.model.ListAccountsResponse;
-import com.google.api.services.tagmanager.model.ListContainerVersionsResponse;
-import com.google.api.services.tagmanager.model.ListContainersResponse;
-import com.google.api.services.tagmanager.model.Parameter;
+	import com.google.api.services.tagmanager.model.ListAccountsResponse;
+	import com.google.api.services.tagmanager.model.ListContainerVersionsResponse;
+	import com.google.api.services.tagmanager.model.ListContainersResponse;
+	import com.google.api.services.tagmanager.model.ListTagsResponse;
+	import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
-import com.google.api.services.tagmanager.model.UserPermission;
-import com.google.api.services.tagmanager.model.Workspace;
+	import com.google.api.services.tagmanager.model.UserPermission;
+	import com.google.api.services.tagmanager.model.Workspace;
+
 	public class GTM_APITest {
 		
 		  // Path to client_secrets.json file downloaded from the Developer's Console.
@@ -91,10 +95,11 @@ import com.google.api.services.tagmanager.model.Workspace;
 				      // Get GTM Workspace ID for example
 				      String ExampleWorkspaceID = "92";
 				      
-				      
-				      
-				      Container example = findGreetingsContainer(manager, ExampleAccountId, ExampleContainerId);
-				      
+				     Container container = manager.accounts().containers().get("accounts/3982950028/containers/9814638").execute();
+				     ListTagsResponse  TagList = manager.accounts().containers().workspaces().tags().list("accounts/56800/containers/98189/workspaces/92").execute();
+				     
+				     System.out.println(TagList);
+				     
 				      /**
 				      List<Account> Project = getAccountList(manager, ProjectAccountID);
 				      List<Container> ProjectContainer = getContainerList(manager, ProjectAccountID);
@@ -105,8 +110,6 @@ import com.google.api.services.tagmanager.model.Workspace;
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
-			
-			  
 }			  
 
 			  private static Credential authorize() throws Exception {
@@ -120,7 +123,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 			        .build();
 
 			    // Authorize.
-			    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+			    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("GA Support");
 			  }
 			  
 			  
@@ -170,6 +173,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 		  				for (Workspace ws : currentList) 
 		  				{
 		  					workspaceList.add(ws);
+		  					workspaceList.stream();
 		  					workspaceList.toArray();
 		  				}
 		  			}
@@ -180,9 +184,6 @@ import com.google.api.services.tagmanager.model.Workspace;
 			  private static List<Tag> getTagList(TagManager service, String containerId, String workspaceId, String accountId)
 				  		throws Exception
 		  		   {
-			  		   List<Account> AccList = getAccountList(service, accountId);
-			  		   List<Container> ContainList = getContainerList(service, accountId);
-			  		   List<Workspace> WSList = getWorkspaceList(service, containerId, accountId);
 			  		   List<Tag> TagList = new ArrayList<Tag>();
 			  		   
 			  		   for(Tag tag : TagList)
@@ -190,32 +191,12 @@ import com.google.api.services.tagmanager.model.Workspace;
 			  			   List<Tag> TList = service.accounts().containers().workspaces().tags().list(tag.getTagId()).execute().getTag();
 			  			   for( Tag t : TList)
 			  			   {
-			  				   TagList.add(t);
-			  				   TagList.toArray();
+			  				   TagList.stream();
 			  			   }
 			  		   }
 			  		   
 			  		   return TagList;
 		  		   }
-			  
-			  private static List<UserPermission> getUP(TagManager service, String accountId)
-						throws Exception
-					{
-						List<UserPermission> UPList = new ArrayList<UserPermission>();
-						
-						return UPList;
-					}
-			  
-			  private static Container findGreetingsContainer(TagManager service, String accountId, String containerId)
-				      throws Exception {
-				    for (Container container :
-				        service.accounts().containers().list(accountId).execute().getContainer()) {
-				      if (container.getContainerId().equals(containerId)) {
-				        return container;
-				      }
-				    }
-				    throw new IllegalArgumentException("No container named Greetings in given account");
-				  }
 				    
 	}
 		    	
