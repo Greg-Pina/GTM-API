@@ -148,49 +148,63 @@ import com.google.api.services.tagmanager.model.Workspace;
 				  return containerList; 	   
 			   }
 			  
-			  private static List<Tag> getTagList(TagManager service, String tagId)
-			  		throws Exception
-	  		   {
-		  		   return service.accounts().containers().workspaces().tags().list(tagId).execute().getTag();
-	  		   }
+
 			  
-			  private static List<Workspace> getWorkspaceList(TagManager service, String workspaceId)
+			  private static List<Workspace> getWorkspaceList(TagManager service, String workspaceId, String accountId)
 	  			throws Exception
 	  			{
 		  			List<Account> Listaccount = getAccountList(service, workspaceId);
-		  			List<Container> containerList = new ArrayList<Container>();
+		  			List<Container> containerList = getContainerList(service, accountId);
 		  			List<Workspace> workspaceList = new ArrayList<Workspace>();
 		  			
 		  			for(Account account: Listaccount)
 		  			{
 		  				List<Workspace> currentList = service.accounts().containers().workspaces().list(account.getAccountId()).execute().getWorkspace();
+		  				for (Workspace ws : currentList) 
+		  				{
+		  					workspaceList.add(ws);
+		  					workspaceList.toArray();
+		  				}
 		  			}
 		  			
 		  			return workspaceList;
 	  			}
+			  
+			  private static List<Tag> getTagList(TagManager service, String tagId, String workspaceId, String accountId)
+				  		throws Exception
+		  		   {
+			  		   List<Account> AccList = getAccountList(service, workspaceId);
+			  		   List<Container> ContainList = getContainerList(service, accountId);
+			  		   List<Workspace> WSList = getWorkspaceList(service, workspaceId, accountId);
+			  		   List<Tag> TagList = new ArrayList<Tag>();
+			  		   
+			  		   for(Tag tag : TagList)
+			  		   {
+			  			   List<Tag> TList = service.accounts().containers().workspaces().tags().list(tag.getTagId()).execute().getTag();
+			  			   for( Tag t : TList)
+			  			   {
+			  				   TagList.add(t);
+			  				   TagList.toArray();
+			  			   }
+			  		   }
+			  		   
+			  		   return TagList;
+		  		   }
+			  
+			  private static List<UserPermission> getUP(TagManager service, String accountId)
+						throws Exception
+					{
+						List<UserPermission> UPList = new ArrayList<UserPermission>();
+						
+						return UPList;
+					}
 	}
 		    	
 		    	
 		    	
 		    	
 		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
-		    	
+
 /*
 		      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 		      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
