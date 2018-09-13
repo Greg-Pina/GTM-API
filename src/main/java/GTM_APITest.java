@@ -92,23 +92,34 @@ import com.google.api.services.tagmanager.model.Parameter;
 				      
 				      // Get GTM Workspace ID for example
 				      String ExampleWorkspaceID = "92";
-				      
+				     
+
+				      List<String> wowCharacters = new ArrayList<String>();
+				      wowCharacters.stream().map(x-> x + "something");
+				      wowCharacters.stream().filter(hero-> !hero.equals("Thrall") );
 				      
 				      // Info from example account
 				     Container EXcontainer = manager.accounts().containers().get("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId).execute();
 				     ListTagsResponse  EXTagList = manager.accounts().containers().workspaces().tags().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
 				     ListVariablesResponse EXVariableList = manager.accounts().containers().workspaces().variables().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
 				     ListTriggersResponse EXTriggerList = manager.accounts().containers().workspaces().triggers().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
+				    
+				     
+				     for( Tag tag : EXTagList.getTag())
+					    {
+					    	
+					    	tag.setAccountId(ProjectAccountID);
+					    	tag.setContainerId(ProjectContainerID);
+				
+					    }
+				     
+
 				     
 				     // Info from project account
 				     Container Projcontainer = manager.accounts().containers().get("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID).execute();
-
+				     TagManager.Accounts.Containers.Workspaces.Tags.Create tags =  manager.accounts().containers().workspaces().tags().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, EXTagList.getTag() );
 				     
-				    for(Tag tag : EXTagList.getTag())
-				    {
-				    	
-				    	System.out.println(tag);
-				    }
+				    
 				     
 				    
 				     /*
