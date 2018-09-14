@@ -43,7 +43,8 @@ import com.google.api.services.tagmanager.model.ListVariablesResponse;
 import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.Tag;
 	import com.google.api.services.tagmanager.model.UserPermission;
-	import com.google.api.services.tagmanager.model.Workspace;
+import com.google.api.services.tagmanager.model.Variable;
+import com.google.api.services.tagmanager.model.Workspace;
 
 	public class GTM_APITest {
 		
@@ -94,34 +95,85 @@ import com.google.api.services.tagmanager.model.Parameter;
 				      String ExampleWorkspaceID = "92";
 				     
 
-				      List<String> wowCharacters = new ArrayList<String>();
-				      wowCharacters.stream().map(x-> x + "something");
-				      wowCharacters.stream().filter(hero-> !hero.equals("Thrall") );
 				      
 				      // Info from example account
-				     Container EXcontainer = manager.accounts().containers().get("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId).execute();
+
 				     ListTagsResponse  EXTagList = manager.accounts().containers().workspaces().tags().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
 				     ListVariablesResponse EXVariableList = manager.accounts().containers().workspaces().variables().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
 				     ListTriggersResponse EXTriggerList = manager.accounts().containers().workspaces().triggers().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
 				    
 				     
-				     for( Tag tag : EXTagList.getTag())
-					    {
-					    	
-					    	tag.setAccountId(ProjectAccountID);
-					    	tag.setContainerId(ProjectContainerID);
-				
-					    }
+				     System.out.println(EXTriggerList.getTrigger());
 				     
-
+				     
+				     
+				     //https://tagmanager.google.com/#/container/accounts/56800/containers/98189/workspaces/92/triggers/1?orgId=PfvMWB6gQWidO80mJ1L4Uw
 				     
 				     // Info from project account
-				     Container Projcontainer = manager.accounts().containers().get("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID).execute();
-				     TagManager.Accounts.Containers.Workspaces.Tags.Create tags =  manager.accounts().containers().workspaces().tags().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, EXTagList.getTag() );
+			
+				     ListTagsResponse ProjectTagList =  manager.accounts().containers().workspaces().tags().list("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID).execute();
+				     ListTriggersResponse ProjectTriggerList = manager.accounts().containers().workspaces().triggers().list("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID).execute();
+				     ListVariablesResponse ProjectVariableList = manager.accounts().containers().workspaces().variables().list("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID).execute();
 				     
+				     
+				     
+				     ProjectTagList = EXTagList.clone();
+				     ProjectTriggerList = EXTriggerList.clone();
+				     ProjectVariableList = EXVariableList.clone();
+				     
+				     
+				     
+				     
+				     for( Tag tag : ProjectTagList.getTag())
+					    {
+					    	if(tag.isEmpty() != true) 
+					    	{
+					    		tag.clear();
+					    	}
+					    		 else 
+	    					{
+				    			 tag.setAccountId(ProjectAccountID);
+						    	 tag.setContainerId(ProjectContainerID);
+						    	
+						    	 manager.accounts().containers().workspaces().tags().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, tag).execute();
+	    					}
+    					}
+				     
+			     	
+				     
+				     for( Trigger trigger : ProjectTriggerList.getTrigger())
+				     {
+				    	 if(trigger.isEmpty() != true)
+				    	 {
+				    		 trigger.clear();
+				    	 }
+					     else
+					    	 {
+					    	 trigger.setAccountId(ProjectAccountID);
+					    	 
+					    	 trigger.setContainerId(ProjectContainerID);
+					    	 
+					    	 manager.accounts().containers().workspaces().triggers().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, trigger).execute();
+					    	 }
+				     }
+				     
+				     
+				     
+				     for( Variable variable : ProjectVariableList.getVariable())
+				     {
+				    	 
+					    		 variable.setAccountId(ProjectAccountID);
+						    		 
+							     variable.setContainerId(ProjectContainerID);
+							     
+							     manager.accounts().containers().workspaces().variables().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, variable).execute();
+				    		 
+				     }
+				     
+				     
+				    			     
 				    
 				     
-				    
 				     /*
 				     System.out.println(TagList.getTag());
 				     System.out.println("");
