@@ -5,7 +5,8 @@
 	 */
 
 	import java.io.File;
-	import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 	import java.util.ArrayList;
 	import java.util.Arrays;
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import com.google.api.services.tagmanager.model.Parameter;
 	import com.google.api.services.tagmanager.model.UserPermission;
 import com.google.api.services.tagmanager.model.Variable;
 import com.google.api.services.tagmanager.model.Workspace;
+import com.google.gson.JsonObject;
 
 	public class GTM_APITest {
 		
@@ -59,7 +61,25 @@ import com.google.api.services.tagmanager.model.Workspace;
 		  private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 		  private static NetHttpTransport httpTransport;
 		  private static FileDataStoreFactory dataStoreFactory;
-
+		  
+		  //project
+		  public static List<Account>   ProjectAccount;
+		  public static List<Container> ProjectContainer;
+		  public static List<Workspace> ProjectWorkSpace;
+		  public static List<Tag>       ProjectTag;
+		  public static List<Trigger>   ProjectTrigger;
+		  public static List<Variable>  ProjectVariable;
+		  
+		  
+		  //examples
+		  public static List<Account>   ExampleAccount;
+		  public static List<Container> ExampleContainer;
+		  public static List<Workspace> ExampleWorkSpace;
+		  public static List<Tag>       ExampleTag;
+		  public static List<Trigger>   ExampleTrigger;
+		  public static List<Variable>  ExampleVariable;
+		  
+		  
 		  public static void main(String[] args) {
 			  try {
 			      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
@@ -82,109 +102,124 @@ import com.google.api.services.tagmanager.model.Workspace;
 				      String ProjectContainerID = "9814638";
 				      
 				      // Get GTM Workspace ID for Project
-				      String ProjectWorkspaceID = "5";
+				      String ProjectWorkspaceID = "7";
 				      
+				      String ProjectPath = "accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID;
 
 				      // Get GTM account ID for example 
-				      String ExampleAccountId = "56800";
+				      String ExampleAccountId = "4131139637";
+				      String OnboardingAccountId = "4131139637";
 				      
 				      // Get GTM Container ID for example
-				      String ExampleContainerId = "98189";
+				      String ExampleContainerId = "9938372";
+				      String OnboardingContainerId = "9938372";
 				      
 				      // Get GTM Workspace ID for example
-				      String ExampleWorkspaceID = "92";
+				      String ExampleWorkspaceID = "21";
 				     
-
+				     String ExamplePath = "accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID;
 				      
 				      // Info from example account
 
-				     ListTagsResponse  EXTagList = manager.accounts().containers().workspaces().tags().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
-				     ListVariablesResponse EXVariableList = manager.accounts().containers().workspaces().variables().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
-				     ListTriggersResponse EXTriggerList = manager.accounts().containers().workspaces().triggers().list("accounts/" + ExampleAccountId + "/containers/" + ExampleContainerId + "/workspaces/" + ExampleWorkspaceID).execute();
+				     ListTagsResponse  EXTagList = manager.accounts().containers().workspaces().tags().list(ExamplePath).execute();
+				     ListVariablesResponse EXVariableList = manager.accounts().containers().workspaces().variables().list(ExamplePath).execute();
+				     ListTriggersResponse EXTriggerList = manager.accounts().containers().workspaces().triggers().list(ExamplePath).execute();
+				    
+				     System.out.println(EXTagList.getTag());
+				     
+				     List<Tag> ProjectTags = new ArrayList<Tag>();
+				     Tag t1, t2, t3, t4,t5,t6;
+				     t1 = EXTagList.getTag().get(0);
+				     ProjectTags.add(t1);
+				     
+				     
+				     System.out.println(t1.get("fingerprint"));
+				 t1.set("name", "test");
+				 
+				 System.out.println(t1);
+				     
+				     /*
+				      * 
+				      * {
+  "accountId": "4131139637",
+  "containerId": "9938372",
+  "fingerprint": "1537195749269",
+  "name": "Criteo - Conversion",
+  "parameter": [
+    {
+      "key": "html",
+      "type": "template",
+      "value": "<script type=\"text/javascript\" src=\"//static.criteo.net/js/ld/ld.js\" async=\"true\"></script>\n <script type=\"text/javascript\">\n window.criteo_q = window.criteo_q || [];\n\n window.criteo_q.push(\n { event: \"setAccount\", account: {{Criteo - Account ID}} },\n { event: \"setSiteType\", type: {{deviceType}} },\n { event: \"setEmail\", email: {{hashedEmail cookie}} },\n { event: \"trackTransaction\", deduplication: {{Criteo - isDuplicate}}, id: {{Ecommerce - Order ID}}, item: {{Criteo - Products Format}}}\n);\n</script>\n"
+    },
+    {
+      "key": "supportDocumentWrite",
+      "type": "boolean",
+      "value": "false"
+    }
+  ],
+  "path": "accounts/4131139637/containers/9938372/workspaces/21/tags/1",
+  "tagFiringOption": "oncePerEvent",
+  "tagId": "1",
+  "tagManagerUrl": "https://tagmanager.google.com/#/container/accounts/4131139637/containers/9938372/workspaces/21/tags/1?apiLink=tag",
+  "type": "html",
+  "workspaceId": "21"
+}
+				      * 
+				      * 
+				      */
+
+				   			
+				     				     
+				     // Info from project account
+				     ListContainersResponse ProjectContainer = manager.accounts().containers().list("accounts/" + ProjectAccountID).execute();
+				     ListTagsResponse  ProjectTagList = manager.accounts().containers().workspaces().tags().list(ProjectPath).execute();
+				     
 				    
 				     
-				     System.out.println(EXTriggerList.getTrigger());
-				     
-				     
-				     
-				     //https://tagmanager.google.com/#/container/accounts/56800/containers/98189/workspaces/92/triggers/1?orgId=PfvMWB6gQWidO80mJ1L4Uw
-				     
-				     // Info from project account
-			
-				     ListTagsResponse ProjectTagList =  manager.accounts().containers().workspaces().tags().list("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID).execute();
-				     ListTriggersResponse ProjectTriggerList = manager.accounts().containers().workspaces().triggers().list("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID).execute();
-				     ListVariablesResponse ProjectVariableList = manager.accounts().containers().workspaces().variables().list("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID).execute();
-				     
-				     
-				     
-				     ProjectTagList = EXTagList.clone();
-				     ProjectTriggerList = EXTriggerList.clone();
-				     ProjectVariableList = EXVariableList.clone();
-				     
-				     
-				     
-				     
+				    
+				    
+				    /*
+				     * 
 				     for( Tag tag : ProjectTagList.getTag())
 					    {
-					    	if(tag.isEmpty() != true) 
-					    	{
-					    		tag.clear();
-					    	}
-					    		 else 
-	    					{
-				    			 tag.setAccountId(ProjectAccountID);
+					    		
+					    		 tag.setAccountId(ProjectAccountID);
 						    	 tag.setContainerId(ProjectContainerID);
 						    	
 						    	 manager.accounts().containers().workspaces().tags().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, tag).execute();
-	    					}
+	    					
     					}
 				     
 			     	
 				     
 				     for( Trigger trigger : ProjectTriggerList.getTrigger())
 				     {
-				    	 if(trigger.isEmpty() != true)
-				    	 {
-				    		 trigger.clear();
-				    	 }
-					     else
-					    	 {
-					    	 trigger.setAccountId(ProjectAccountID);
+
+				    		 trigger.setAccountId(ProjectAccountID);
 					    	 
 					    	 trigger.setContainerId(ProjectContainerID);
 					    	 
 					    	 manager.accounts().containers().workspaces().triggers().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, trigger).execute();
-					    	 }
+					    	
+				   
 				     }
 				     
 				     
 				     
 				     for( Variable variable : ProjectVariableList.getVariable())
 				     {
-				    	 
-					    		 variable.setAccountId(ProjectAccountID);
-						    		 
-							     variable.setContainerId(ProjectContainerID);
-							     
-							     manager.accounts().containers().workspaces().variables().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, variable).execute();
+
+				    		 variable.setAccountId(ProjectAccountID);
 				    		 
+						     variable.setContainerId(ProjectContainerID);
+						     
+						     manager.accounts().containers().workspaces().variables().create("accounts/" + ProjectAccountID + "/containers/" + ProjectContainerID + "/workspaces/" + ProjectWorkspaceID, variable).execute();
+			    		 
+				    	 
 				     }
-				     
-				     
-				    			     
 				    
-				     
-				     /*
-				     System.out.println(TagList.getTag());
-				     System.out.println("");
-				     System.out.println(VariableList.getVariable());
-				     System.out.println("");
-				     System.out.println(TriggerList.getTrigger());
-				     System.out.println("");
-				     System.out.println(container.getName());
-				     System.out.println("");
-				     
 				     */
+				    
 				     
 				     
 				     
@@ -199,9 +234,58 @@ import com.google.api.services.tagmanager.model.Workspace;
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
+			  
+			  
+			  
+		  
 }			  
 
-			  private static Credential authorize() throws Exception {
+		  private static JsonObject TagJSON(String acctID, String contID, String Param, String Priority, String Type)
+		  {
+			  JsonObject obj = new JsonObject();
+			  
+			  
+			  
+			  
+			  return obj;
+		  }
+		  
+		  private static List<Account> getAccountList(TagManager service)
+			      throws Exception 
+		   {
+		    	  return service.accounts().list().execute().getAccount();
+
+		   }
+		  
+		  private static List<Container> getContainerList(TagManager service, String projectacctID, String ExampleacctID)
+			      throws Exception 
+		   {
+		        
+			  List<Account> accountList = getAccountList(service);
+			  List<Container> containerList = new ArrayList<Container>(); 
+			  
+			  for(Account acct : accountList)
+			  {
+				  List<Container> currList = service.accounts().containers().list(acct.getAccountId()).execute().getContainer();
+					  for(Container c : currList)
+					  {
+						  if(c.getAccountId().equals(ExampleacctID))
+						  {
+							  c.setAccountId(projectacctID);
+							  c.set
+						  }
+					  }
+			  }
+			  
+			  return containerList; 	   
+		   }
+
+			  private static void If(boolean equals) {
+			// TODO Auto-generated method stub
+			
+		}
+
+			private static Credential authorize() throws Exception {
 			    // Load client secrets.
 			    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
 			        new InputStreamReader(GTM_APITest.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
@@ -214,48 +298,12 @@ import com.google.api.services.tagmanager.model.Workspace;
 			    // Authorize.
 			    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("GA Support");
 			  }
-			  
-				    
-	}
-		    	
-		    	
-		    	
-		    	
-		    	
-
-/*
-		      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-		      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
-
-		      // Authorization flow.
-		      Credential credential = authorize();
-		      TagManager manager = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
-		          .setApplicationName(Google_Tag_Manager).build();
-
-		      // Get tag manager account ID for Project.
-		      String accountId = "3982950028";
-
-		      // Find the Greg_Pina_Test Project container.
-		      Container Greg_Pina_Test = findProjectContainer(manager, accountId);
-		      String ProjectcontainerId = Greg_Pina_Test.getContainerId();
-		      
-		      // Get GTM account ID for example container
-		      String ExampleAccountId = "56800";
-		      
-		      // Find the example container
-		      Container Example_Container = findTestContainer(manager, ExampleAccountId);
-		      String ExampleContainerId = Example_Container.getContainerId();
-		      List<String> wowCharacters = new ArrayList<String>();
-		      wowCharacters.stream().map(x-> x + "something");
-		      wowCharacters.stream().filter(hero-> !hero.equals("Thrall") );
-		     
-		      List<Workspace> wsList = new ArrayList<Workspace>();
 		      
 		      
 		      //This pulls the tags from example container
-
+		      
 			      
-		      getTagList(manager);
+	}
 		      
 		      /*
 		       * Return example container (as object)
@@ -273,7 +321,6 @@ import com.google.api.services.tagmanager.model.Workspace;
 		       *    
 		       *    
 		       *
-
 		    } catch (Exception e) {
 		      e.printStackTrace();
 		    }
@@ -292,16 +339,13 @@ import com.google.api.services.tagmanager.model.Workspace;
 		    // Load client secrets.
 		    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
 		        new InputStreamReader(GTM_APITest.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
-
 		    // Set up authorization code flow for all auth scopes.
 		    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
 		        JSON_FACTORY, clientSecrets, TagManagerScopes.all()).setDataStoreFactory(dataStoreFactory)
 		        .build();
-
 		    // Authorize.
 		    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
 		  }
-
 		  /*
 		   * Find the Greg_Pina_Test container ID.
 		   *
