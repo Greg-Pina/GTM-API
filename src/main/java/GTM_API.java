@@ -101,24 +101,20 @@ import com.google.gson.JsonObject;
 				     * 
 				     */
 			      
-
-
-			      System.out.println(manager.accounts().containers().list("accounts/56800").execute().getContainer());
+			      
+			      System.out.println(manager.accounts().containers().list("accounts/4131139637").execute().getContainer());
+			      checkContainer("GregPina Test Container", "56800", "GTM-D54D");
 			      
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
 			  
-			  CreateContainer("Greg's Test Container", "56800", "GTM-D54D");
+			
 }
 	
-		  
-
-		   
-		  private static void CreateContainer(String containerName, String accountID, String ContainerPublicID)
-		  {
-			  try {
-			  
+	  private static void checkContainer(String containerName, String accountID, String ContainerPublicID)
+	  {			 
+		  try {
 			  String accountPath = "accounts/" + accountID;
 			  String ExamplePath = "accounts/" + "4131139637" + "/containers/" + "9938372";
 			  
@@ -126,8 +122,6 @@ import com.google.gson.JsonObject;
 			  
 			  //grab Test Container = InfoTrust -> Test Container
 			  exampleContainer = manager.accounts().containers().get(ExamplePath).execute();
-			  
-			  
 			  
 			  
 			  //checking if new container doesn't already exist in target path
@@ -172,11 +166,7 @@ import com.google.gson.JsonObject;
 			  
 			  if(!exampleContainer.isEmpty())
 			  {
-				  Container newContainer = new Container();
-				  newContainer.setAccountId(accountPath);
-				  newContainer.setName(containerName);
-				  newContainer.setUsageContext(Arrays.asList("web"));
-				  newContainer = manager.accounts().containers().create(accountID, newContainer).execute();
+				  CreateContainer(manager, containerName, accountID);
 			  }
 			  
 		  }
@@ -192,52 +182,86 @@ import com.google.gson.JsonObject;
 				  e.printStackTrace();
 			  }
 		  
-
+	  }
 		  
-		  }
-		  
-		  
-		  
-			private static Variable newVarFromExample(Variable exampleVariable, String VariablePath) {
-				Variable var = exampleVariable.clone();
-				var = var.setAccountId(null).setContainerId(null).setFingerprint(null).setParentFolderId(null).setTagManagerUrl(null).setWorkspaceId(null).setVariableId(null);
-				return var;
-			}
-		  private static List<Account> getAccountList(TagManager service)
-			      throws Exception 
-		   {
-		    	  return service.accounts().list().execute().getAccount();
-
-		   }
-
-		  
-		  private static List<Container> getContainerList(TagManager service, String projectacctID, String ExampleacctID)
-			      throws Exception 
-		   {
-		        
-			  List<Account> accountList = getAccountList(service);
-			  List<Container> containerList = new ArrayList<Container>(); 
-			  
-			  for(Account acct : accountList)
-			  {
-				  List<Container> currList = service.accounts().containers().list(acct.getAccountId()).execute().getContainer();
-					  for(Container c : currList)
-					  {
-						 
-					  }
-			  }
-			  
-			  return containerList; 	   
-		   }
-		  
-		  private static Container CreateContainer(TagManager service, Container name) 
+		  private static Container CreateContainer(TagManager service,String containerName, String accountID) throws IOException 
 		  {
-			  name.setName("test_container");
-			  name.setUsageContext(Arrays.asList("web", "android", "ios"));
+			  Container newContainer = new Container();
+			  String accountPath = "accounts/" + accountID;
+					  
+			  newContainer.setAccountId(accountPath);
+			  newContainer.setName(containerName);
+			  newContainer.setUsageContext(Arrays.asList("web"));
+			  try {
+				Container response = manager.accounts().containers().create(accountID, newContainer).execute();
+			  }
+			  catch (GoogleJsonResponseException e)
+			  {
+				  System.err.println("There was a service error : " + e.getDetails().getCode() + " : " + e.getDetails().getMessage() );
+			  }
 			 
 			  
-			  return name;
+			  return newContainer;
 		  }
+
+		  private static Variable CreateVariable(TagManager service, String name, String accountID, String containerID, String workspaceID, String ParamType)
+		  {
+			  Variable newVariable = new Variable();
+			  
+			  newVariable.setName(name);
+			  newVariable.setAccountId(accountID);
+			  newVariable.setContainerId(containerID);
+			  newVariable.setWorkspaceId(workspaceID);
+			  
+			  
+			  return newVariable;
+		  }
+		  
+		  private static Tag CreateTag(TagManager service, String name, String accountID, String containerID, String workspaceID, String ParamType)
+		  {
+			  Tag newTag = new Tag();
+			  
+			  newTag.setName(name);
+			  newTag.setAccountId(accountID);
+			  newTag.setContainerId(containerID);
+			  newTag.setWorkspaceId(workspaceID);
+			  newTag.setType(ParamType);
+			  
+			  
+			  Parameter param0 = new Parameter();
+			  param0.setType(null);
+			  param0.setKey(null);
+			  param0.setValue(null);
+			  
+			  Parameter param1 = new Parameter();
+			  param1.setType(null);
+			  param1.setKey(null);
+			  param1.setValue(null);
+			  
+			  Parameter param2 = new Parameter();
+			 
+			  
+			  
+			  
+			  
+			  return newTag;
+		  }
+		  
+		  private static Trigger CreateTrigger(TagManager service, String name, String accountID, String containerID, String workspaceID, String ParamType)
+		  {
+			  Trigger newTrigger = new Trigger();
+			  
+			  newTrigger.setName(name);
+			  newTrigger.setAccountId(accountID);
+			  newTrigger.setContainerId(containerID);
+			  newTrigger.setWorkspaceId(workspaceID);
+			  
+			  
+			  return newTrigger;
+		  }
+
+		  
+
 		  
 
 			private static Credential authorize() throws Exception {
@@ -394,6 +418,39 @@ import com.google.gson.JsonObject;
 "workspaceId": "21"
 }
 	      * 
+	      * 
+	      * 		  
+			private static Variable newVarFromExample(Variable exampleVariable, String VariablePath) {
+				Variable var = exampleVariable.clone();
+				var = var.setAccountId(null).setContainerId(null).setFingerprint(null).setParentFolderId(null).setTagManagerUrl(null).setWorkspaceId(null).setVariableId(null);
+				return var;
+			}
+		  private static List<Account> getAccountList(TagManager service)
+			      throws Exception 
+		   {
+		    	  return service.accounts().list().execute().getAccount();
+
+		   }
+	      * 
+	      * 		  
+		  private static List<Container> getContainerList(TagManager service, String projectacctID, String ExampleacctID)
+			      throws Exception 
+		   {
+		        
+			  List<Account> accountList = getAccountList(service);
+			  List<Container> containerList = new ArrayList<Container>(); 
+			  
+			  for(Account acct : accountList)
+			  {
+				  List<Container> currList = service.accounts().containers().list(acct.getAccountId()).execute().getContainer();
+					  for(Container c : currList)
+					  {
+						 
+					  }
+			  }
+			  
+			  return containerList; 	   
+		   }
 	      * 
 	      */
 	
