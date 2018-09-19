@@ -48,7 +48,26 @@ dependencies {
    compile group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.22.0'
    compile group: 'com.google.oauth-client', name: 'google-oauth-client-servlet', version: '1.22.0'
    compile group: 'javax.servlet', 			 name: 'javax.servlet-api', version: '3.0.1'
-	
+	    // https://mvnrepository.com/artifact/org.json/json
+compile group: 'org.json', name: 'json', version: '20180813'
+    	compile group: 'log4j', name: 'log4j', version: '1.2.17'
+    compile('com.google.apis:google-api-services-tagmanager:v2-rev4-1.23.0')
+    compile('com.google.apis:google-api-services-analytics:v3-rev142-1.23.0')
+    compile('com.google.api-client:google-api-client:1.23.0')
+    compile('com.google.apis:google-api-services-analyticsreporting:v4-rev118-1.23.0')
+    compile('com.google.apis:google-api-services-dfareporting:v3.0-rev1-1.23.0')
+    compile 'com.google.http-client:google-http-client-gson:1.19.0'
+    compile group: 'com.google.oauth-client', name: 'google-oauth-client-java6', version: '1.22.0'
+    compile group: 'com.google.oauth-client', name: 'google-oauth-client-jetty', version: '1.22.0'
+    compile group: 'com.google.oauth-client', name: 'google-oauth-client-servlet', version: '1.22.0'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'    
+    compile group: 'com.opencsv', name: 'opencsv', version: '4.1'
+    compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+    compile group: 'org.apache.poi', name: 'poi-scratchpad', version: '3.17'
+    compile group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: '3.17'
+    compile group: 'org.apache.poi', name: 'poi-excelant', version: '3.17'
+    compile group: 'org.apache.poi', name: 'poi-examples', version: '3.17'
 	
 }
 
