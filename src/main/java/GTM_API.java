@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import org.apache.*;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.*;
 
 import org.apache.commons.codec.language.bm.Rule;
@@ -77,6 +79,9 @@ import com.google.gson.JsonObject;
 			      manager = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
 			          .setApplicationName(APPLICATION_NAME).build();
 			      
+			      TagManager test = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
+				          .setApplicationName(APPLICATION_NAME).build();
+			      
 			      /**   
 					 * 
 					 * Project info
@@ -95,17 +100,22 @@ import com.google.gson.JsonObject;
 				     * 		same with variables
 				     * 
 				     */
+			      
 
-				      
+
+			      System.out.println(manager.accounts().containers().list("accounts/56800").execute().getContainer());
 			      
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
 			  
+			  CreateContainer("Greg's Test Container", "56800", "GTM-D54D");
+}
+	
 		  
-}			  
-		  
-		  private static CreateContainer(String containerName, String accountID, String ContainerPublicID)
+
+		   
+		  private static void CreateContainer(String containerName, String accountID, String ContainerPublicID)
 		  {
 			  try {
 			  
@@ -115,7 +125,7 @@ import com.google.gson.JsonObject;
 			  Container exampleContainer = new Container();
 			  
 			  //grab Test Container = InfoTrust -> Test Container
-			  EXContainer = manager.accounts().containers().get(ExamplePath).execute();
+			  exampleContainer = manager.accounts().containers().get(ExamplePath).execute();
 			  
 			  
 			  
@@ -142,19 +152,50 @@ import com.google.gson.JsonObject;
 				  List<Account> AccountList = manager.accounts().list().execute().getAccount();
 				  if(AccountList != null && !AccountList.isEmpty())
 				  {
-					  for(Account account : s)
+					  for(Account account : AccountList)
+					  {
+						  System.out.println(account.getName());
+						  List<Container> accountContainers = manager.accounts().containers().list(account.getAccountId()).execute().getContainer();
+						  if(accountContainers != null && !accountContainers.isEmpty())
+						  {
+							  long foundContainer = accountContainers.stream().filter(container -> container.getPublicId().equals(ContainerPublicID)).count();
+							  if (foundContainer > 0)
+							  {
+								  exampleContainer = accountContainers.stream().filter(container -> container.getPublicId().equals(ContainerPublicID)).collect(Collectors.toList()).get(0);
+								  break;
+							  }
+						  }
+					  }
+					  Thread.sleep(2000);
 				  }
 			  }
 			  
-		  }
-			  catch 
+			  if(!exampleContainer.isEmpty())
 			  {
+				  Container newContainer = new Container();
+				  newContainer.setAccountId(accountPath);
+				  newContainer.setName(containerName);
+				  newContainer.setUsageContext(Arrays.asList("web"));
+				  newContainer = manager.accounts().containers().create(accountID, newContainer).execute();
+			  }
 			  
+		  }
+			  catch (GoogleJsonResponseException e)
+			  {
+				  System.err.println("There was a service error:" + e.getDetails().getCode() + ":" + e.getDetails().getMessage());
+			  } catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			  catch (InterruptedException e)
+			  {
+				  e.printStackTrace();
 			  }
 		  
 
 		  
 		  }
+		  
 		  
 		  
 			private static Variable newVarFromExample(Variable exampleVariable, String VariablePath) {
@@ -220,7 +261,7 @@ import com.google.gson.JsonObject;
 	}
 		  
 		  
-	}
+
 		      /*
 
 		  
