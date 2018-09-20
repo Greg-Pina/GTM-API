@@ -52,7 +52,7 @@ import com.google.api.services.tagmanager.model.Workspace;
 import com.google.gson.JsonObject;
 
 	public class GTM_APITest {
-		
+		/*
 		  // Path to client_secrets.json file downloaded from the Developer's Console.
 		  // The path is relative to GTM_APITest.java.
 		  private static final String CLIENT_SECRET_JSON_RESOURCE = "client_secrets.json";
@@ -98,6 +98,8 @@ import com.google.gson.JsonObject;
 					 * Project info
 					 *  
 					 **/
+		
+		/*
 					// Get tag manager account ID for Project.
 				      String ProjectAccountID = "3982950028";
 				      
@@ -165,7 +167,7 @@ import com.google.gson.JsonObject;
 				     * 
 				     * 
 				     */
-				 
+				 /*
 				 System.out.println(t1.getParameter());
 				     
 				 System.out.println(EXContainer.getContainer());
@@ -226,7 +228,7 @@ import com.google.gson.JsonObject;
 				      */
 
 				   			
-				     				     
+				     /*				     
 				     // Info from project account
 				     ListContainersResponse ProjectContainer = manager.accounts().containers().list("accounts/" + ProjectAccountID).execute();
 				     ListTagsResponse  ProjectTagList = manager.accounts().containers().workspaces().tags().list(ProjectPath).execute();
@@ -279,7 +281,7 @@ import com.google.gson.JsonObject;
 				    
 				     
 				     
-				     
+				     /*
 				     
 				      /**
 				      List<Account> Project = getAccountList(manager, ProjectAccountID);
@@ -287,14 +289,14 @@ import com.google.gson.JsonObject;
 				      List<Workspace> ProjectWorkspace = getWorkspaceList(manager, ProjectContainerID, ProjectAccountID);
 				      **/
 				      
-			      
+			  /*    
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
 			  
 			  
 			  
-		  
+		  /*
 }			  
 
 		  private static JsonObject TagJSON(String acctID, String contID, String Param, String Priority, String Type)
@@ -333,6 +335,7 @@ import com.google.gson.JsonObject;
 					}
 		  
 		  */
+			  /*
 			private static Variable newVarFromExample(Variable exampleVariable) {
 				Variable var = exampleVariable.clone();
 				var = var.setAccountId(null).setContainerId(null).setFingerprint(null).setParentFolderId(null).setTagManagerUrl(null).setWorkspaceId(null).setVariableId(null);
@@ -568,3 +571,7 @@ import com.google.gson.JsonObject;
 	
 	
 	*/
+
+		
+	}
+				     
