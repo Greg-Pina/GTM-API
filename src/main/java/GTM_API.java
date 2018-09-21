@@ -86,36 +86,12 @@ import com.google.gson.JsonObject;
 			      
 			      TagManager test = new TagManager.Builder(httpTransport, JSON_FACTORY, credential)
 				          .setApplicationName(APPLICATION_NAME).build();
-			      
-			      /**   
-					 * 
-					 * Project info
-					 *  
-					 **/
-
-				    
-				    /*
-				     * 
-				     * what I need to do is create a function that will allow me to be able to create a project container
-				     * 
-				     * then function to call the example container
-				     * 
-				     * 		after calling example container, new function will create new tags for my project container from the example
-				     * 		same with triggers
-				     * 		same with variables
-				     * 
-				     */
-			      
-			      
-
-			    
+ 
 			      
 			    } catch (Exception e) {
 			      e.printStackTrace();
 			    }
-			  
-			  
-			  
+ 
 			  cloneExampleContainer("Greg_Pina_Test_Container", "56800", "GTM-PNJH2T");
 
 			}
@@ -139,20 +115,12 @@ import com.google.gson.JsonObject;
 
 				String accountPath = "accounts/" + accountId;
 				Container exampleContainer = new Container();
-				
-				
-				
-				try {
 
-					//For Testing
-					//List<Container> TestexampleContainer = manager.accounts().containers().list("accounts/56800").execute().getContainer();
-					//System.out.print(TestexampleContainer);
+				try {
 					
 					//Loop through containers on specified account to verify new container doesn't already exist
 					List<Container> targetAccountContainers = manager.accounts().containers().list("accounts/" + accountId).execute().getContainer();
 					Container existingContainer = new Container();
-					
-				
 
 					if(targetAccountContainers != null && !targetAccountContainers.isEmpty()) {
 						for (Container accountContainer : targetAccountContainers) {
@@ -165,6 +133,7 @@ import com.google.gson.JsonObject;
 
 					exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
 					Workspace exampleWS = manager.accounts().containers().workspaces().get("accounts/38028818/containers/970849/workspaces/42/").execute();
+					String ExampleWS_String = exampleWS.getPath().toString();
 					
 					if(existingContainer.isEmpty()) {
 						// Get example container using publicContainerId
@@ -194,19 +163,21 @@ import com.google.gson.JsonObject;
 							newContainer.setUsageContext(Arrays.asList("web"));
 							newContainer = manager.accounts().containers().create(accountPath, newContainer).execute();
 							System.out.println(containerName + " created successfuly");
-							System.out.println(newContainer.getPath().toString());
+							//System.out.println(newContainer.getPath().toString());
 							Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
 
+							String newWorkSpaceString = newWS.getPath().toString();
+							
 							//Copy Variables to New Container
 							
-							List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(newWS.getPath()).execute().getVariable();
+							List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
 							if(existingVariables != null && !existingVariables.isEmpty()) {
 								for(Variable existingVariable : existingVariables) {
 									Thread.sleep(1000);
 									Variable newVariable = existingVariable.clone();
 									newVariable.getWorkspaceId();
 									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
-									newVariable = manager.accounts().containers().workspaces().variables().create(newWS.getPath(), newVariable).execute();
+									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
 									System.out.println(newVariable.getName() + " created successfuly");
 								}
 							}
@@ -215,7 +186,7 @@ import com.google.gson.JsonObject;
 							
 							HashMap<String, String> triggerMap = new HashMap<>();
 
-							List<Trigger> existingTriggers = manager.accounts().containers().workspaces().triggers().list(newWS.getPath()).execute().getTrigger();
+							List<Trigger> existingTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
 							if(existingTriggers != null && !existingTriggers.isEmpty()) {
 								for (Trigger existingTrigger : existingTriggers) {
 									Thread.sleep(1000);
@@ -224,7 +195,7 @@ import com.google.gson.JsonObject;
 									if(existingTrigger.getTriggerId().equals(ALL_PAGES_TRIGGER_ID)) {
 										newTrigger.setTriggerId(ALL_PAGES_TRIGGER_ID);
 									}
-									newTrigger = manager.accounts().containers().workspaces().triggers().create(newWS.getPath(), newTrigger).execute();
+									newTrigger = manager.accounts().containers().workspaces().triggers().create(newWorkSpaceString, newTrigger).execute();
 									System.out.println(newTrigger.getName() + " (" + newTrigger.getTriggerId() + ") created");
 									triggerMap.put(existingTrigger.getTriggerId(), newTrigger.getTriggerId());
 								}
@@ -233,7 +204,7 @@ import com.google.gson.JsonObject;
 							//Copy tags to new container, attaching appropriate triggers/rules
 							
 
-							List<Tag> existingTags = manager.accounts().containers().workspaces().tags().list(newWS.getPath()).execute().getTag();
+							List<Tag> existingTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
 							if(existingTags != null && !existingTags.isEmpty()) {
 								for (Tag existingTag : existingTags) {
 									Thread.sleep(1000);
@@ -274,7 +245,7 @@ import com.google.gson.JsonObject;
 									if(!newBlockingTriggers.isEmpty()) { newTag.setBlockingTriggerId(newBlockingTriggers);}
 									if(!newFiringTriggers.isEmpty()) { newTag.setFiringTriggerId(newFiringTriggers);}
 
-									newTag = manager.accounts().containers().workspaces().tags().create(newWS.getPath(), newTag).execute();
+									newTag = manager.accounts().containers().workspaces().tags().create(newWorkSpaceString, newTag).execute();
 									System.out.println(newTag.getName() + " created successfuly");
 
 								}
@@ -298,7 +269,7 @@ import com.google.gson.JsonObject;
 						if (version != null) {
 							System.out.println("Container Version Id = " + version.getContainerVersionId());
 							System.out.println("Container Version Fingerprint = " + version.getFingerprint());
-							manager.accounts().containers().versions().publish("accounts/" + accountId + "/containers/" + existingContainer.getContainerId() + "/versions/"+ version.getContainerVersionId()).execute();
+							manager.accounts().containers().versions().publish("accounts/" + accountId + "/containers/" + existingContainer.getContainerId() + "/workspaces/92" + "/versions/"+ version.getContainerVersionId()).execute();
 							System.out.println("Container version " + version.getContainerVersionId() + " created and published");
 						}
 						//System.out.println("----- Container Copy Complete -----");
