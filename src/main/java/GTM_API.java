@@ -57,7 +57,8 @@ import com.google.api.services.tagmanager.model.Variable;
 import com.google.api.services.tagmanager.model.Workspace;
 import com.google.gson.JsonObject;
 
-	public class GTM_API {
+	public class GTM_API 
+	{
 		
 		  // Path to client_secrets.json file downloaded from the Developer's Console.
 		  // The path is relative to GTM_APITest.java.
@@ -71,11 +72,12 @@ import com.google.gson.JsonObject;
 		  private static NetHttpTransport httpTransport;
 		  private static FileDataStoreFactory dataStoreFactory;
 		  private static TagManager manager;
-		// 'All Pages' trigger Id
-			private static final String ALL_PAGES_TRIGGER_ID = "2147479553";
+		  private static final String ALL_PAGES_TRIGGER_ID = "2147479553";
 		  
-		  public static void main(String[] args) {
-			  try {
+		  public static void main(String[] args) throws IOException 
+		  {
+			  try 
+			  {
 			      httpTransport = GoogleNetHttpTransport.newTrustedTransport();
 			      dataStoreFactory = new FileDataStoreFactory(DATA_STORE_DIR);
 
@@ -88,7 +90,8 @@ import com.google.gson.JsonObject;
 				          .setApplicationName(APPLICATION_NAME).build();
  
 			      
-			    } catch (Exception e) {
+			    } catch (Exception e) 
+			  	{
 			      e.printStackTrace();
 			    }
  
@@ -96,7 +99,8 @@ import com.google.gson.JsonObject;
 
 			}
 
-			private static Credential authorize() throws Exception {
+			private static Credential authorize() throws Exception 
+			{
 				// Load client secrets.
 				GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
 						new InputStreamReader(GTM_API.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
@@ -111,40 +115,57 @@ import com.google.gson.JsonObject;
 			}
 
 			
-			private static void cloneExampleContainer(String containerName, String accountId, String exampleContainerPublicId) {
+			private static void cloneExampleContainer(String containerName, String accountId, String exampleContainerPublicId) throws IOException
+			{
 
 				String accountPath = "accounts/" + accountId;
 				Container exampleContainer = new Container();
-
-				try {
+				exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
+				Workspace exampleWS = manager.accounts().containers().workspaces().get("accounts/38028818/containers/970849/workspaces/43/").execute();
+				String ExampleWS_String = exampleWS.getPath().toString();
+				try 
+				{
 					
 					//Loop through containers on specified account to verify new container doesn't already exist
 					List<Container> targetAccountContainers = manager.accounts().containers().list("accounts/" + accountId).execute().getContainer();
 					Container existingContainer = new Container();
 
-					if(targetAccountContainers != null && !targetAccountContainers.isEmpty()) {
-						for (Container accountContainer : targetAccountContainers) {
-							if(accountContainer.getName().equals(containerName)) {
+					if(targetAccountContainers != null && !targetAccountContainers.isEmpty())
+					{
+						for (Container accountContainer : targetAccountContainers)
+						{
+							if(accountContainer.getName().equals(containerName)) 
+							{
 								existingContainer = accountContainer.clone();
 								System.out.println("Container exists.");
 							}
 						}
 					}
 
-					exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
-					Workspace exampleWS = manager.accounts().containers().workspaces().get("accounts/38028818/containers/970849/workspaces/42/").execute();
-					String ExampleWS_String = exampleWS.getPath().toString();
+
 					
-					if(existingContainer.isEmpty()) {
+
+					
+					if(existingContainer.isEmpty()) 
+					{
 						// Get example container using publicContainerId
 						List<Account> allAccounts = manager.accounts().list().execute().getAccount();
 
-						if(allAccounts != null && !allAccounts.isEmpty()) {
-							for(Account account : allAccounts) {
+						if(allAccounts != null && !allAccounts.isEmpty())
+						{
+							System.out.println("Looping through all accounts...");
+							System.out.println();
+							System.out.println();
+							for(Account account : allAccounts) 
+							{
+								System.out.println(account.getName());
 								List<Container> accountContainers = manager.accounts().containers().list("accounts/" + account.getAccountId()).execute().getContainer();
-								if(accountContainers != null && !accountContainers.isEmpty()) {
+								if(accountContainers != null && !accountContainers.isEmpty()) 
+								{
+									//long not int
 									long matchingContainersFound = accountContainers.stream().filter(c-> c.getPublicId().equals(exampleContainerPublicId)).count();
-									if (matchingContainersFound > 0) {
+									if (matchingContainersFound > 0) 
+									{
 										exampleContainer = accountContainers.stream().filter(c-> c.getPublicId().equals(exampleContainerPublicId)).collect(Collectors.toList()).get(0);
 										break;
 									}
@@ -153,42 +174,230 @@ import com.google.gson.JsonObject;
 							}
 						}
 
-						if(!exampleContainer.isEmpty()) {
+						if(!exampleContainer.isEmpty()) 
+						{
 
-							
-							//Create new container under specific account
 							Container newContainer = new Container();
+							//Create new container under specific account
+							System.out.println("Container Created");
+							
+						    newContainer = new Container();
 							newContainer.setAccountId(accountPath);
 							newContainer.setName(containerName);
 							newContainer.setUsageContext(Arrays.asList("web"));
 							newContainer = manager.accounts().containers().create(accountPath, newContainer).execute();
-							System.out.println(containerName + " created successfuly");
+							System.out.println(containerName + " copied and created successfuly");
 							//System.out.println(newContainer.getPath().toString());
 							Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
 
 							String newWorkSpaceString = newWS.getPath().toString();
+							System.out.println("-----------------------------------------------");
+							System.out.println();
+							
+							
+
 							
 							//Copy Variables to New Container
-							
-							List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
-							if(existingVariables != null && !existingVariables.isEmpty()) {
-								for(Variable existingVariable : existingVariables) {
-									Thread.sleep(1000);
-									Variable newVariable = existingVariable.clone();
+							System.out.println("*** Copying Variables ***");
+							System.out.println();
+						  Variable newVariable = new Variable();
+						  List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
+							if(existingVariables != null && !existingVariables.isEmpty()) 
+							{
+								for(Variable existingVariable : existingVariables) 
+								{
+									Thread.sleep(2000);
+								    newVariable = existingVariable.clone();
 									newVariable.getWorkspaceId();
 									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
 									System.out.println(newVariable.getName() + " created successfuly");
 								}
 							}
-
+							System.out.println("-----------------------------------------------");
+							System.out.println();
 							//Copy triggers to new container
+							  Trigger copiedTrigger = new Trigger();
+							  System.out.println("*** Copying Triggers *** ");
+							  System.out.println();
+							  HashMap<String, String> triggerMap = new HashMap<>();
 							
-							HashMap<String, String> triggerMap = new HashMap<>();
+											List<Trigger> existingTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
+											if(existingTriggers != null && !existingTriggers.isEmpty()) 
+											{
+												for ( Trigger existingTrigger : existingTriggers) 
+												{
+													Thread.sleep(2000);
+													Trigger newTrigger = existingTrigger.clone();
+													newTrigger.setAccountId(null).setContainerId(null).setFingerprint(null).setTriggerId(null).setUniqueTriggerId(null);
+													if(existingTrigger.getTriggerId().equals(ALL_PAGES_TRIGGER_ID)) 
+													{
+														newTrigger.setTriggerId(ALL_PAGES_TRIGGER_ID);
+													}
+													newTrigger = manager.accounts().containers().workspaces().triggers().create(newWorkSpaceString, newTrigger).execute();
+													System.out.println(newTrigger.getName() + " created successfuly");
+									triggerMap.put(existingTrigger.getTriggerId(), newTrigger.getTriggerId());
+									
+									copiedTrigger = existingTrigger;
+								}
+							}
+							System.out.println("-----------------------------------------------");
+							System.out.println();
+
+							//Copy tags to new container, attaching appropriate triggers/rules
+							Tag copiedTag = new Tag();
+							System.out.println("*** Copying Tags *** ");
+							System.out.println();
+							List<Tag> existingTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
+							if(existingTags != null && !existingTags.isEmpty()) 
+							{
+								for (Tag existingTag : existingTags) 
+								{
+									Thread.sleep(2000);
+									Tag newTag = existingTag.clone();
+									newTag.set("parentFolderId",null);
+							newTag.set("setupTag",null);
+							newTag.set("teardownTag",null);
+							newTag.setAccountId(null).setContainerId(null).setFingerprint(null).setTagId(null).setBlockingTriggerId(null).setFiringTriggerId(null);
+							
+							//Associate new triggers to tag
+							List<String> newBlockingTriggers = new ArrayList<String>();
+							List<String> newFiringTriggers = new ArrayList<String>();
+							
+							List<String> existingBlockingTriggers = existingTag.getBlockingTriggerId();
+							if(existingBlockingTriggers != null && !existingBlockingTriggers.isEmpty()) 
+							{
+								for(String blockingTriggerId : existingBlockingTriggers) 
+								{
+									if(blockingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) 
+									{
+										newBlockingTriggers.add(ALL_PAGES_TRIGGER_ID);
+									}else 
+									{
+										newBlockingTriggers.add(triggerMap.get(blockingTriggerId));
+									}
+							
+								}
+							}
+						
+						List<String> existingFiringTriggers = existingTag.getFiringTriggerId();
+						if(existingFiringTriggers != null && !existingFiringTriggers.isEmpty()) 
+						{
+							for(String firingTriggerId : existingFiringTriggers) 
+							{
+								if(firingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) 
+								{
+									newFiringTriggers.add(ALL_PAGES_TRIGGER_ID);
+								}else 
+								{
+									newFiringTriggers.add(triggerMap.get(firingTriggerId));
+								}
+						
+							}
+						}
+						
+						if(!newBlockingTriggers.isEmpty()) { newTag.setBlockingTriggerId(newBlockingTriggers);}
+						if(!newFiringTriggers.isEmpty()) { newTag.setFiringTriggerId(newFiringTriggers);}
+						
+						newTag = manager.accounts().containers().workspaces().tags().create(newWorkSpaceString, newTag).execute();
+						System.out.println(newTag.getName() + " created successfuly");
+						
+													
+													copiedTag = newTag;
+								}
+								
+							}
+							System.out.println("-----------------------------------------------");
+							System.out.println();			
+					
+						//Publish new container via the API
+						System.out.println("*** Container Successfully Copied & Published ***");
+						CreateContainerVersionRequestVersionOptions options = new  CreateContainerVersionRequestVersionOptions();
+						options.setName("Sample Container Version");
+						options.setNotes("Sample Container Version");
+						CreateContainerVersionResponse response = manager.accounts().containers().workspaces().createVersion(newWorkSpaceString, options).execute();
+						}
+
+					}
+					
+						
+				}catch (GoogleJsonResponseException e) 
+				{
+					System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
+					e.printStackTrace();
+				} catch (IOException e) 
+				{
+					e.printStackTrace();
+				} catch (InterruptedException e) 
+				{
+					e.printStackTrace();
+				}
+			}
+		
+			
+	
+
+		  
+		  private static Container CopyContainer(TagManager service, Container newContainer, String containerName, String accountPath) throws IOException 
+		  {
+				System.out.println("----- Create Container -----");
+				//Create new container under specific account
+			    newContainer = new Container();
+				newContainer.setAccountId(accountPath);
+				newContainer.setName(containerName);
+				newContainer.setUsageContext(Arrays.asList("web"));
+				newContainer = manager.accounts().containers().create(accountPath, newContainer).execute();
+				System.out.println(containerName + " created successfuly");
+				//System.out.println(newContainer.getPath().toString());
+				Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
+
+				String newWorkSpaceString = newWS.getPath().toString();
+				
+				return newContainer;
+		  }
+
+		  
+		  
+		  private static Variable CopyVariablestoNewContainer(TagManager service, Container newContainer, String newWorkSpaceString, String ExampleWS_String) throws IOException, InterruptedException
+		  {
+			  Container exampleContainer = new Container();
+			  exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
+			  Workspace exampleWS = manager.accounts().containers().workspaces().get("accounts/38028818/containers/970849/workspaces/42/").execute();
+			  ExampleWS_String = exampleWS.getPath().toString();
+			  Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
+			  newWorkSpaceString = newWS.getPath().toString();
+			  
+			  Variable newVariable = new Variable();
+			  List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
+							if(existingVariables != null && !existingVariables.isEmpty()) {
+								for(Variable existingVariable : existingVariables) {
+									Thread.sleep(1000);
+								    newVariable = existingVariable.clone();
+									newVariable.getWorkspaceId();
+									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
+									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
+									System.out.println(newVariable.getName() + " created successfuly");
+								}
+							}
+							
+							return newVariable;
+		  }
+		  private static Trigger CopyTriggertoNewContainer(TagManager service, Container newContainer, String newWorkSpaceString, String ExampleWS_String) throws IOException, InterruptedException
+		  {
+			  Container exampleContainer = new Container();
+			  exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
+			  Workspace exampleWS = manager.accounts().containers().workspaces().get("accounts/38028818/containers/970849/workspaces/42/").execute();
+			  ExampleWS_String = exampleWS.getPath().toString();
+			  Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
+			  newWorkSpaceString = newWS.getPath().toString();
+			  
+			  Trigger copiedTrigger = new Trigger();
+			  
+			  HashMap<String, String> triggerMap = new HashMap<>();
 
 							List<Trigger> existingTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
 							if(existingTriggers != null && !existingTriggers.isEmpty()) {
-								for (Trigger existingTrigger : existingTriggers) {
+								for ( Trigger existingTrigger : existingTriggers) {
 									Thread.sleep(1000);
 									Trigger newTrigger = existingTrigger.clone();
 									newTrigger.setAccountId(null).setContainerId(null).setFingerprint(null).setTriggerId(null).setUniqueTriggerId(null);
@@ -198,12 +407,25 @@ import com.google.gson.JsonObject;
 									newTrigger = manager.accounts().containers().workspaces().triggers().create(newWorkSpaceString, newTrigger).execute();
 									System.out.println(newTrigger.getName() + " (" + newTrigger.getTriggerId() + ") created");
 									triggerMap.put(existingTrigger.getTriggerId(), newTrigger.getTriggerId());
+									
+									copiedTrigger = existingTrigger;
 								}
 							}
-
-							//Copy tags to new container, attaching appropriate triggers/rules
 							
-
+							return copiedTrigger;
+		  }
+		   
+		  private static Tag CopyTagtoNewContainer(TagManager service, Container newContainer, String newWorkSpaceString, String ExampleWS_String, HashMap<String, String> triggerMap) throws IOException, InterruptedException
+		  {
+			  Container exampleContainer = new Container();
+			  exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
+			  Workspace exampleWS = manager.accounts().containers().workspaces().get("accounts/38028818/containers/970849/workspaces/42/").execute();
+			  ExampleWS_String = exampleWS.getPath().toString();
+			  Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
+			  newWorkSpaceString = newWS.getPath().toString();
+			  
+			  				Tag copiedTag = new Tag();
+			  
 							List<Tag> existingTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
 							if(existingTags != null && !existingTags.isEmpty()) {
 								for (Tag existingTag : existingTags) {
@@ -248,140 +470,16 @@ import com.google.gson.JsonObject;
 									newTag = manager.accounts().containers().workspaces().tags().create(newWorkSpaceString, newTag).execute();
 									System.out.println(newTag.getName() + " created successfuly");
 
+									
+									copiedTag = newTag;
 								}
 								
 							}
-
-						}
-
-
-					}else {
-
-						//Publish new container via the API
-						System.out.println("----- Create Container Version & Publish -----");
-						CreateContainerVersionRequestVersionOptions options = new  CreateContainerVersionRequestVersionOptions();
-						options.setName("Sample Container Version");
-						options.setNotes("Sample Container Version");
-						CreateContainerVersionResponse response = manager.accounts().containers().workspaces().createVersion("accounts/" + accountId + "/containers/" + existingContainer.getContainerId() + "/workspaces/92", options).execute();
-
-						System.out.println("Compiler Error = " + response.getCompilerError());
-						ContainerVersion version = response.getContainerVersion();
-						if (version != null) {
-							System.out.println("Container Version Id = " + version.getContainerVersionId());
-							System.out.println("Container Version Fingerprint = " + version.getFingerprint());
-							manager.accounts().containers().versions().publish("accounts/" + accountId + "/containers/" + existingContainer.getContainerId() + "/workspaces/92" + "/versions/"+ version.getContainerVersionId()).execute();
-							System.out.println("Container version " + version.getContainerVersionId() + " created and published");
-						}
-						//System.out.println("----- Container Copy Complete -----");
-					}
-				}catch (GoogleJsonResponseException e) {
-					//System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		
-	}
-			
-	/*
-
-		  
-		  private static Container CreateContainer(TagManager service, Container newContainer, String containerName, String accountPath) throws IOException 
-		  {
-				System.out.println("----- Create Container -----");
-				//Create new container under specific account
-				Container newContainer = new Container();
-				newContainer.setAccountId(accountPath);
-				newContainer.setName(containerName);
-				newContainer.setUsageContext(Arrays.asList("web"));
-				newContainer = manager.accounts().containers().create(accountPath, newContainer).execute();
-				System.out.println(containerName + " created");
-		  }
-
-		  private static Variable CreateVariable(TagManager service, String name, String accountID, String containerID, String workspaceID, String ParamType)
-		  {
-			  Variable newVariable = new Variable();
-			  
-			  newVariable.setName(name);
-			  newVariable.setAccountId(accountID);
-			  newVariable.setContainerId(containerID);
-			  newVariable.setWorkspaceId(workspaceID);
-			  
-			  
-			  return newVariable;
+							
+							return copiedTag;
 		  }
 		  
-		  private static Tag CreateTag(TagManager service, String name, String accountID, String containerID, String workspaceID, String ParamType)
-		  {
-			  Tag newTag = new Tag();
-			  
-			  newTag.setName(name);
-			  newTag.setAccountId(accountID);
-			  newTag.setContainerId(containerID);
-			  newTag.setWorkspaceId(workspaceID);
-			  newTag.setType(ParamType);
-			  
-			  
-			  Parameter param0 = new Parameter();
-			  param0.setType(null);
-			  param0.setKey(null);
-			  param0.setValue(null);
-			  
-			  Parameter param1 = new Parameter();
-			  param1.setType(null);
-			  param1.setKey(null);
-			  param1.setValue(null);
-			  
-			  Parameter param2 = new Parameter();
-			 
-			  
-			  
-			  
-			  
-			  return newTag;
-		  }
-		  
-		  private static Trigger CreateTrigger(TagManager service, String name, String accountID, String containerID, String workspaceID, String ParamType)
-		  {
-			  Trigger newTrigger = new Trigger();
-			  
-			  newTrigger.setName(name);
-			  newTrigger.setAccountId(accountID);
-			  newTrigger.setContainerId(containerID);
-			  newTrigger.setWorkspaceId(workspaceID);
-			  
-			  
-			  return newTrigger;
-		  }
 
-		  
-
-		  
-
-			private static Credential authorize() throws Exception {
-			    // Load client secrets.
-			    GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-			        new InputStreamReader(GTM_API.class.getResourceAsStream(CLIENT_SECRET_JSON_RESOURCE)));
-
-			    // Set up authorization code flow for all auth scopes.
-			    GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
-			        JSON_FACTORY, clientSecrets, TagManagerScopes.all()).setDataStoreFactory(dataStoreFactory)
-			        .build();
-
-			    // Authorize.
-			    return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("GA Support");
-			  }
-		      
-		      
-		      //This pulls the tags from example container
-		      
-			      
-	}
-		  
-		  
 
 		      /*
 
@@ -550,4 +648,6 @@ import com.google.gson.JsonObject;
 		   }
 	      * 
 	      */
+		  
+	}
 	
