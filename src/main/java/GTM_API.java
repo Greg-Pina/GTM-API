@@ -125,7 +125,7 @@ import com.google.gson.JsonObject;
 					
 					//Loop through containers on specified account to verify new container doesn't already exist
 					List<Container> targetAccountContainers = manager.accounts().containers().list("accounts/" + accountId).execute().getContainer();
-					Container existingContainer = new Container();
+					Container createdContainer = new Container();
 
 					if(targetAccountContainers != null && !targetAccountContainers.isEmpty())
 					{
@@ -133,17 +133,13 @@ import com.google.gson.JsonObject;
 						{
 							if(accountContainer.getName().equals(containerName)) 
 							{
-								existingContainer = accountContainer.clone();
+								createdContainer = accountContainer.clone();
 								System.out.println("Container exists.");
 							}
 						}
 					}
 
-
-					
-
-					
-					if(existingContainer.isEmpty()) 
+					if(createdContainer.isEmpty()) 
 					{
 						// Get example container using publicContainerId
 						List<Account> allAccounts = manager.accounts().list().execute().getAccount();
@@ -175,6 +171,8 @@ import com.google.gson.JsonObject;
 						{
 							Container newContainer = new Container();
 							//Create new container under specific account
+							System.out.println();
+							System.out.println();
 							System.out.println("Container Created");
 							
 						    newContainer = new Container();
@@ -197,13 +195,13 @@ import com.google.gson.JsonObject;
 							System.out.println("*** Copying Variables ***");
 							System.out.println();
 						  Variable newVariable = new Variable();
-						  List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
-							if(existingVariables != null && !existingVariables.isEmpty()) 
+						  List<Variable> exampleVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
+							if(exampleVariables != null && !exampleVariables.isEmpty()) 
 							{
-								for(Variable existingVariable : existingVariables) 
+								for(Variable createdVariable : exampleVariables) 
 								{
 									Thread.sleep(2000);
-								    newVariable = existingVariable.clone();
+								    newVariable = createdVariable.clone();
 									newVariable.getWorkspaceId();
 									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
@@ -220,21 +218,21 @@ import com.google.gson.JsonObject;
 							  System.out.println();
 							  HashMap<String, String> triggerMap = new HashMap<>();
 							
-							List<Trigger> existingTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
-							if(existingTriggers != null && !existingTriggers.isEmpty()) 
+							List<Trigger> exampleTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
+							if(exampleTriggers != null && !exampleTriggers.isEmpty()) 
 							{
-								for ( Trigger existingTrigger : existingTriggers) 
+								for ( Trigger createdTrigger : exampleTriggers) 
 								{
 									Thread.sleep(2000);
-									Trigger newTrigger = existingTrigger.clone();
+									Trigger newTrigger = createdTrigger.clone();
 									newTrigger.setAccountId(null).setContainerId(null).setFingerprint(null).setTriggerId(null).setUniqueTriggerId(null);
-									if(existingTrigger.getTriggerId().equals(ALL_PAGES_TRIGGER_ID)) 
+									if(createdTrigger.getTriggerId().equals(ALL_PAGES_TRIGGER_ID)) 
 									{
 										newTrigger.setTriggerId(ALL_PAGES_TRIGGER_ID);
 									}
 									newTrigger = manager.accounts().containers().workspaces().triggers().create(newWorkSpaceString, newTrigger).execute();
 									System.out.println(newTrigger.getName() + " created successfuly");
-									triggerMap.put(existingTrigger.getTriggerId(), newTrigger.getTriggerId());
+									triggerMap.put(createdTrigger.getTriggerId(), newTrigger.getTriggerId());
 									
 									
 								}
@@ -248,13 +246,13 @@ import com.google.gson.JsonObject;
 							
 							System.out.println("*** Copying Tags *** ");
 							System.out.println();
-							List<Tag> existingTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
-							if(existingTags != null && !existingTags.isEmpty()) 
+							List<Tag> exampleTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
+							if(exampleTags != null && !exampleTags.isEmpty()) 
 							{
-								for (Tag existingTag : existingTags) 
+								for (Tag createdTag : exampleTags) 
 								{
 									Thread.sleep(2000);
-									Tag newTag = existingTag.clone();
+									Tag newTag = createdTag.clone();
 									newTag.set("parentFolderId",null);
 							newTag.set("setupTag",null);
 							newTag.set("teardownTag",null);
@@ -264,7 +262,7 @@ import com.google.gson.JsonObject;
 							List<String> newBlockingTriggers = new ArrayList<String>();
 							List<String> newFiringTriggers = new ArrayList<String>();
 							
-							List<String> existingBlockingTriggers = existingTag.getBlockingTriggerId();
+							List<String> existingBlockingTriggers = createdTag.getBlockingTriggerId();
 							if(existingBlockingTriggers != null && !existingBlockingTriggers.isEmpty()) 
 							{
 								for(String blockingTriggerId : existingBlockingTriggers) 
@@ -280,7 +278,7 @@ import com.google.gson.JsonObject;
 								}
 							}
 						
-						List<String> existingFiringTriggers = existingTag.getFiringTriggerId();
+						List<String> existingFiringTriggers = createdTag.getFiringTriggerId();
 						if(existingFiringTriggers != null && !existingFiringTriggers.isEmpty()) 
 						{
 							for(String firingTriggerId : existingFiringTriggers) 
@@ -307,16 +305,11 @@ import com.google.gson.JsonObject;
 								}
 								
 							}
-							System.out.println("-----------------------------------------------");
-							System.out.println();			
-					
-						//Publish new container via the API
+						System.out.println("-----------------------------------------------");
+						System.out.println();			
+
 						System.out.println("*** Container Successfully Copied & Published ***");
-//						CreateContainerVersionRequestVersionOptions options = new  CreateContainerVersionRequestVersionOptions();
-//						options.setName("Sample Container Version");
-//						options.setNotes("Sample Container Version");
-//						CreateContainerVersionResponse response = manager.accounts().containers().workspaces().createVersion(newWorkSpaceString, options).execute();
-						}
+}
 
 					}
 					
@@ -334,8 +327,6 @@ import com.google.gson.JsonObject;
 				}
 			}
 		
-			
-	
 
 		  
 		  private static Container CopyContainer(TagManager service, Container newContainer, String containerName, String accountPath) throws IOException 
@@ -366,11 +357,11 @@ import com.google.gson.JsonObject;
 			  newWorkSpaceString = newWS.getPath().toString();
 			  
 			  Variable newVariable = new Variable();
-			  List<Variable> existingVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
-							if(existingVariables != null && !existingVariables.isEmpty()) {
-								for(Variable existingVariable : existingVariables) {
+			  List<Variable> exampleVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
+							if(exampleVariables != null && !exampleVariables.isEmpty()) {
+								for(Variable createdVariable : exampleVariables) {
 									Thread.sleep(1000);
-								    newVariable = existingVariable.clone();
+								    newVariable = createdVariable.clone();
 									newVariable.getWorkspaceId();
 									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
@@ -394,20 +385,20 @@ import com.google.gson.JsonObject;
 			  
 			  HashMap<String, String> triggerMap = new HashMap<>();
 
-			List<Trigger> existingTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
-			if(existingTriggers != null && !existingTriggers.isEmpty()) {
-				for ( Trigger existingTrigger : existingTriggers) {
+			List<Trigger> exampleTriggers = manager.accounts().containers().workspaces().triggers().list(ExampleWS_String).execute().getTrigger();
+			if(exampleTriggers != null && !exampleTriggers.isEmpty()) {
+				for ( Trigger createdTrigger : exampleTriggers) {
 					Thread.sleep(1000);
-					Trigger newTrigger = existingTrigger.clone();
+					Trigger newTrigger = createdTrigger.clone();
 					newTrigger.setAccountId(null).setContainerId(null).setFingerprint(null).setTriggerId(null).setUniqueTriggerId(null);
-					if(existingTrigger.getTriggerId().equals(ALL_PAGES_TRIGGER_ID)) {
+					if(createdTrigger.getTriggerId().equals(ALL_PAGES_TRIGGER_ID)) {
 						newTrigger.setTriggerId(ALL_PAGES_TRIGGER_ID);
 					}
 					newTrigger = manager.accounts().containers().workspaces().triggers().create(newWorkSpaceString, newTrigger).execute();
 					System.out.println(newTrigger.getName() + " (" + newTrigger.getTriggerId() + ") created");
-					triggerMap.put(existingTrigger.getTriggerId(), newTrigger.getTriggerId());
+					triggerMap.put(createdTrigger.getTriggerId(), newTrigger.getTriggerId());
 					
-					copiedTrigger = existingTrigger;
+					copiedTrigger = createdTrigger;
 				}
 			}
 			
@@ -425,11 +416,11 @@ import com.google.gson.JsonObject;
 			  
 			  				Tag copiedTag = new Tag();
 			  
-							List<Tag> existingTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
-				if(existingTags != null && !existingTags.isEmpty()) {
-					for (Tag existingTag : existingTags) {
+							List<Tag> exampleTags = manager.accounts().containers().workspaces().tags().list(ExampleWS_String).execute().getTag();
+				if(exampleTags != null && !exampleTags.isEmpty()) {
+					for (Tag createdTag : exampleTags) {
 						Thread.sleep(1000);
-						Tag newTag = existingTag.clone();
+						Tag newTag = createdTag.clone();
 						newTag.set("parentFolderId",null);
 						newTag.set("setupTag",null);
 						newTag.set("teardownTag",null);
@@ -439,7 +430,7 @@ import com.google.gson.JsonObject;
 						List<String> newBlockingTriggers = new ArrayList<String>();
 						List<String> newFiringTriggers = new ArrayList<String>();
 			
-						List<String> existingBlockingTriggers = existingTag.getBlockingTriggerId();
+						List<String> existingBlockingTriggers = createdTag.getBlockingTriggerId();
 						if(existingBlockingTriggers != null && !existingBlockingTriggers.isEmpty()) {
 							for(String blockingTriggerId : existingBlockingTriggers) {
 								if(blockingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) {
@@ -451,7 +442,7 @@ import com.google.gson.JsonObject;
 							}
 						}
 			
-						List<String> existingFiringTriggers = existingTag.getFiringTriggerId();
+						List<String> existingFiringTriggers = createdTag.getFiringTriggerId();
 						if(existingFiringTriggers != null && !existingFiringTriggers.isEmpty()) {
 							for(String firingTriggerId : existingFiringTriggers) {
 								if(firingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) {
