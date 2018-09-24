@@ -93,7 +93,7 @@ import com.google.gson.JsonObject;
 			      e.printStackTrace();
 			    }
 			  
-			  cloneExampleContainer("Greg_Pina_Test_Container", "56800", "GTM-PNJH2T");
+			  cloneExampleContainer("Greg_Pina_Test", "56800", "GTM-PNJH2T");
 
 			}
 
@@ -115,6 +115,8 @@ import com.google.gson.JsonObject;
 			
 			private static void cloneExampleContainer(String containerName, String accountId, String exampleContainerPublicId) throws IOException
 			{
+				
+
 				String accountPath = "accounts/" + accountId;
 				Container exampleContainer = new Container();
 				exampleContainer = manager.accounts().containers().get("accounts/38028818/containers/970849").execute();
@@ -185,6 +187,8 @@ import com.google.gson.JsonObject;
 							Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
 
 							String newWorkSpaceString = newWS.getPath().toString();
+							
+							
 							System.out.println("-----------------------------------------------");
 							System.out.println();
 							
@@ -205,6 +209,7 @@ import com.google.gson.JsonObject;
 									newVariable.getWorkspaceId();
 									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
+								
 									System.out.println(newVariable.getName() + " created successfuly");
 								}
 							}
@@ -262,10 +267,10 @@ import com.google.gson.JsonObject;
 							List<String> newBlockingTriggers = new ArrayList<String>();
 							List<String> newFiringTriggers = new ArrayList<String>();
 							
-							List<String> existingBlockingTriggers = createdTag.getBlockingTriggerId();
-							if(existingBlockingTriggers != null && !existingBlockingTriggers.isEmpty()) 
+							List<String> exampleBlockingTriggers = createdTag.getBlockingTriggerId();
+							if(exampleBlockingTriggers != null && !exampleBlockingTriggers.isEmpty()) 
 							{
-								for(String blockingTriggerId : existingBlockingTriggers) 
+								for(String blockingTriggerId : exampleBlockingTriggers) 
 								{
 									if(blockingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) 
 									{
@@ -278,10 +283,10 @@ import com.google.gson.JsonObject;
 								}
 							}
 						
-						List<String> existingFiringTriggers = createdTag.getFiringTriggerId();
-						if(existingFiringTriggers != null && !existingFiringTriggers.isEmpty()) 
+						List<String> exampleFiringTriggers = createdTag.getFiringTriggerId();
+						if(exampleFiringTriggers != null && !exampleFiringTriggers.isEmpty()) 
 						{
-							for(String firingTriggerId : existingFiringTriggers) 
+							for(String firingTriggerId : exampleFiringTriggers) 
 							{
 								if(firingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) 
 								{
@@ -430,9 +435,9 @@ import com.google.gson.JsonObject;
 						List<String> newBlockingTriggers = new ArrayList<String>();
 						List<String> newFiringTriggers = new ArrayList<String>();
 			
-						List<String> existingBlockingTriggers = createdTag.getBlockingTriggerId();
-						if(existingBlockingTriggers != null && !existingBlockingTriggers.isEmpty()) {
-							for(String blockingTriggerId : existingBlockingTriggers) {
+						List<String> exampleBlockingTriggers = createdTag.getBlockingTriggerId();
+						if(exampleBlockingTriggers != null && !exampleBlockingTriggers.isEmpty()) {
+							for(String blockingTriggerId : exampleBlockingTriggers) {
 								if(blockingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) {
 									newBlockingTriggers.add(ALL_PAGES_TRIGGER_ID);
 								}else {
@@ -442,9 +447,9 @@ import com.google.gson.JsonObject;
 							}
 						}
 			
-						List<String> existingFiringTriggers = createdTag.getFiringTriggerId();
-						if(existingFiringTriggers != null && !existingFiringTriggers.isEmpty()) {
-							for(String firingTriggerId : existingFiringTriggers) {
+						List<String> exampleFiringTriggers = createdTag.getFiringTriggerId();
+						if(exampleFiringTriggers != null && !exampleFiringTriggers.isEmpty()) {
+							for(String firingTriggerId : exampleFiringTriggers) {
 								if(firingTriggerId.equals(ALL_PAGES_TRIGGER_ID)) {
 									newFiringTriggers.add(ALL_PAGES_TRIGGER_ID);
 								}else {
