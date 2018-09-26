@@ -38,10 +38,12 @@ import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
 import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces;
 import com.google.api.services.tagmanager.TagManagerScopes;
 import com.google.api.services.tagmanager.model.Account;
+import com.google.api.services.tagmanager.model.BuiltInVariable;
 import com.google.api.services.tagmanager.model.Condition;
 import com.google.api.services.tagmanager.model.Trigger;
 import com.google.api.services.tagmanager.model.Container;
 import com.google.api.services.tagmanager.model.ContainerVersion;
+import com.google.api.services.tagmanager.model.CreateBuiltInVariableResponse;
 import com.google.api.services.tagmanager.model.CreateContainerVersionRequestVersionOptions;
 import com.google.api.services.tagmanager.model.CreateContainerVersionResponse;
 import com.google.api.services.tagmanager.model.ListAccountsResponse;
@@ -199,6 +201,8 @@ import com.google.gson.JsonObject;
 							System.out.println("*** Copying Variables ***");
 							System.out.println();
 						  Variable newVariable = new Variable();
+						  BuiltInVariable newBIVariable = new BuiltInVariable();
+						  CreateBuiltInVariableResponse BIresponse = new CreateBuiltInVariableResponse();
 						  List<Variable> exampleVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
 							if(exampleVariables != null && !exampleVariables.isEmpty()) 
 							{
@@ -211,6 +215,25 @@ import com.google.gson.JsonObject;
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
 								
 									System.out.println(newVariable.getName() + " created successfuly");
+								}
+							}
+							
+							List<BuiltInVariable> BIVariables = manager.accounts().containers().workspaces().builtInVariables().list(ExampleWS_String).execute().getBuiltInVariable();
+							if(BIVariables != null && !BIVariables.isEmpty())
+							{
+								for( BuiltInVariable BIVariable : BIVariables)
+								{
+									Thread.sleep(2000);
+									
+									newBIVariable = BIVariable.clone();
+									newBIVariable.getType();
+									newBIVariable.getWorkspaceId();
+									newBIVariable.setAccountId(null).setContainerId(null);
+									BIresponse.setBuiltInVariable(BIVariables);
+									
+									BIresponse = manager.accounts().containers().workspaces().builtInVariables().create(newWorkSpaceString).execute();
+									
+									System.out.println( BIresponse.getBuiltInVariable().toString()+ "created successfully");
 								}
 							}
 							System.out.println("-----------------------------------------------");
@@ -306,16 +329,27 @@ import com.google.gson.JsonObject;
 						System.out.println(newTag.getName() + " created successfuly");
 						
 													
-												
+				
 								}
-								
+							
 							}
+							
+						System.out.println("Publishing Container Version");
+						CreateContainerVersionRequestVersionOptions options = new  CreateContainerVersionRequestVersionOptions();
+						options.setName("Published Version");
+						options.setNotes("Published Version");
+						
+						ContainerVersion version = manager.accounts().containers().versions().publish(newContainer.getPath().toString() + "/versions/1").execute().getContainerVersion();
+						manager.accounts().containers().versions().publish(newContainer.getPath().toString() + version.getContainerVersionId()).execute();
+						
+					
 						System.out.println("-----------------------------------------------");
 						System.out.println();			
 
 						System.out.println("*** Container Successfully Copied & Published ***");
-}
-
+						
+							
+						}
 					}
 					
 						
