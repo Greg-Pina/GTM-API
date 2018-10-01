@@ -37,6 +37,7 @@ import com.google.api.services.tagmanager.TagManager.Accounts.Containers;
 import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
 import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces;
 import com.google.api.services.tagmanager.TagManagerScopes;
+import com.google.api.services.tagmanager.model.*;
 import com.google.api.services.tagmanager.model.Account;
 import com.google.api.services.tagmanager.model.BuiltInVariable;
 import com.google.api.services.tagmanager.model.Condition;
@@ -49,6 +50,7 @@ import com.google.api.services.tagmanager.model.CreateContainerVersionResponse;
 import com.google.api.services.tagmanager.model.ListAccountsResponse;
 import com.google.api.services.tagmanager.model.ListContainerVersionsResponse;
 import com.google.api.services.tagmanager.model.ListContainersResponse;
+import com.google.api.services.tagmanager.model.ListEnabledBuiltInVariablesResponse;
 import com.google.api.services.tagmanager.model.ListTagsResponse;
 import com.google.api.services.tagmanager.model.ListTriggersResponse;
 import com.google.api.services.tagmanager.model.ListVariablesResponse;
@@ -95,8 +97,8 @@ import com.google.gson.JsonObject;
 			      e.printStackTrace();
 			    }
 			  
-			  cloneExampleContainer("Greg_Pina_Test", "56800", "GTM-PNJH2T");
-
+			 cloneExampleContainer("Greg_Pina_Test_Container", "56800", "GTM-PNJH2T");
+			  
 			}
 
 			private static Credential authorize() throws Exception 
@@ -200,10 +202,9 @@ import com.google.gson.JsonObject;
 							//Copy Variables to New Container
 							System.out.println("*** Copying Variables ***");
 							System.out.println();
-						  Variable newVariable = new Variable();
-						  BuiltInVariable newBIVariable = new BuiltInVariable();
-						  CreateBuiltInVariableResponse BIresponse = new CreateBuiltInVariableResponse();
-						  List<Variable> exampleVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
+						    Variable newVariable = new Variable();
+						    BuiltInVariable newBIVariable = new BuiltInVariable();
+						    List<Variable> exampleVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
 							if(exampleVariables != null && !exampleVariables.isEmpty()) 
 							{
 								for(Variable createdVariable : exampleVariables) 
@@ -211,7 +212,7 @@ import com.google.gson.JsonObject;
 									Thread.sleep(2000);
 								    newVariable = createdVariable.clone();
 									newVariable.getWorkspaceId();
-									newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
+									//newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
 								
 									System.out.println(newVariable.getName() + " created successfuly");
@@ -226,14 +227,10 @@ import com.google.gson.JsonObject;
 									Thread.sleep(2000);
 									
 									newBIVariable = BIVariable.clone();
-									newBIVariable.getType();
-									newBIVariable.getWorkspaceId();
-									newBIVariable.setAccountId(null).setContainerId(null);
-									BIresponse.setBuiltInVariable(BIVariables);
-									
-									BIresponse = manager.accounts().containers().workspaces().builtInVariables().create(newWorkSpaceString).execute();
-									
-									System.out.println( BIresponse.getBuiltInVariable().toString()+ "created successfully");
+									// where did bi variable response go?
+									com.google.api.services.tagmanager.model.ListEnabledBuiltInVariablesResponse response = new ListEnabledBuiltInVariablesResponse();
+									response.getBuiltInVariable();
+									System.out.println( newBIVariable.getName() + "created successfully");
 								}
 							}
 							System.out.println("-----------------------------------------------");
@@ -282,8 +279,8 @@ import com.google.gson.JsonObject;
 									Thread.sleep(2000);
 									Tag newTag = createdTag.clone();
 									newTag.set("parentFolderId",null);
-							newTag.set("setupTag",null);
-							newTag.set("teardownTag",null);
+									newTag.set("setupTag",null);
+									newTag.set("teardownTag",null);
 							newTag.setAccountId(null).setContainerId(null).setFingerprint(null).setTagId(null).setBlockingTriggerId(null).setFiringTriggerId(null);
 							
 							//Associate new triggers to tag
@@ -339,10 +336,12 @@ import com.google.gson.JsonObject;
 						options.setName("Published Version");
 						options.setNotes("Published Version");
 						
-						ContainerVersion version = manager.accounts().containers().versions().publish(newContainer.getPath().toString() + "/versions/1").execute().getContainerVersion();
+						CreateContainerVersionResponse response = manager.accounts().containers().versions().create(accountId, createdContainer.getContainerId(), options).execute();
+
 						manager.accounts().containers().versions().publish(newContainer.getPath().toString() + version.getContainerVersionId()).execute();
 						
-					
+						
+						
 						System.out.println("-----------------------------------------------");
 						System.out.println();			
 
@@ -518,22 +517,7 @@ import com.google.gson.JsonObject;
 		   {
 		        return service.accounts().list().execute().getAccount(); 
 		   }
-		  
-		  private static List<Workspaces> getWorkspaceList(TagManager service)
-		  			throws Exception
-		  			{
-			  			List<Account> Listaccount = getAccountList(service);
-			  			List<Container> containerList = new ArrayList<Container>();
-			  			List<Workspace> workspaceList = new ArrayList<Workspace>();
-			  			
-			  			for(Account account: Listaccount)
-			  			{
-			  				List<Workspace> currentList = service.accounts().containers().workspaces().list(account.getAccountId()).execute().getWorkspace();
-			  			}
-			  			
-			  			return service.accounts().containers().workspaces().list(a.getAccountID()).execute().getWorkspace();
-		  			}
-		  
+		   
 		  private static List<Container> getContainerList(TagManager service)
 			      throws Exception 
 		   {
@@ -561,6 +545,23 @@ import com.google.gson.JsonObject;
 			  
 			  return containerList; 	   
 		   }
+		   
+		  private static List<Workspaces> getWorkspaceList(TagManager service)
+		  			throws Exception
+		  			{
+			  			List<Account> Listaccount = getAccountList(service);
+			  			List<Container> containerList = new ArrayList<Container>();
+			  			List<Workspace> workspaceList = new ArrayList<Workspace>();
+			  			
+			  			for(Account account: Listaccount)
+			  			{
+			  				List<Workspace> currentList = service.accounts().containers().workspaces().list(account.getAccountId()).execute().getWorkspace();
+			  			}
+			  			
+			  			return service.accounts().containers().workspaces().list(a.getAccountID()).execute().getWorkspace();
+		  			}
+		  
+		  
 		  
 		  
 		  
