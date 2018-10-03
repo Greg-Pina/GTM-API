@@ -228,8 +228,9 @@ import com.google.gson.JsonObject;
 									
 									newBIVariable = BIVariable.clone();
 									// where did bi variable response go?
-									com.google.api.services.tagmanager.model.ListEnabledBuiltInVariablesResponse response = new ListEnabledBuiltInVariablesResponse();
-									response.getBuiltInVariable();
+									CreateBuiltInVariableResponse response = new CreateBuiltInVariableResponse();
+									response.getBuiltInVariable().equals(newBIVariable);
+									response = manager.accounts().containers().workspaces().builtInVariables().create(newWorkSpaceString).execute();
 									System.out.println( newBIVariable.getName() + "created successfully");
 								}
 							}
@@ -335,11 +336,17 @@ import com.google.gson.JsonObject;
 						CreateContainerVersionRequestVersionOptions options = new  CreateContainerVersionRequestVersionOptions();
 						options.setName("Published Version");
 						options.setNotes("Published Version");
-						
-						CreateContainerVersionResponse response = manager.accounts().containers().versions().create(accountId, createdContainer.getContainerId(), options).execute();
-
+						CreateContainerVersionResponse response = new CreateContainerVersionResponse();
+						response.setNewWorkspacePath(newWorkSpaceString);
+						ContainerVersion version = response.getContainerVersion();
 						manager.accounts().containers().versions().publish(newContainer.getPath().toString() + version.getContainerVersionId()).execute();
 						
+						if( version != null )
+						{
+							System.out.print("Container Version ID = " + version.getContainerVersionId());
+							System.out.println("Container Version Fingerprint = " + version.getFingerprint());
+							manager.accounts().containers().versions().update(newContainer.getPath().toString() + "/version/" + version.getContainerVersionId(), version.setName("Published Version")).execute();
+						}
 						
 						
 						System.out.println("-----------------------------------------------");
@@ -506,6 +513,8 @@ import com.google.gson.JsonObject;
 				
 				return copiedTag;
 		  }
+		  
+		  
 		  
 
 
