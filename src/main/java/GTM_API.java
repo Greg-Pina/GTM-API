@@ -97,7 +97,7 @@ import com.google.gson.JsonObject;
 			      e.printStackTrace();
 			    }
 			  
-			 cloneExampleContainer("Greg_Pina_Test_Container", "56800", "GTM-PNJH2T");
+			 cloneExampleContainer("Greg_Pina_Test_new", "56800", "GTM-PNJH2T");
 			  
 			}
 
@@ -220,6 +220,7 @@ import com.google.gson.JsonObject;
 							}
 							
 							List<BuiltInVariable> BIVariables = manager.accounts().containers().workspaces().builtInVariables().list(ExampleWS_String).execute().getBuiltInVariable();
+							List<BuiltInVariable> createdBiV = manager.accounts().containers().workspaces().builtInVariables().list(newWorkSpaceString).execute().getBuiltInVariable();
 							if(BIVariables != null && !BIVariables.isEmpty())
 							{
 								for( BuiltInVariable BIVariable : BIVariables)
@@ -229,9 +230,10 @@ import com.google.gson.JsonObject;
 									newBIVariable = BIVariable.clone();
 									// where did bi variable response go?
 									CreateBuiltInVariableResponse response = new CreateBuiltInVariableResponse();
-									response.getBuiltInVariable().equals(newBIVariable);
+									
+									response.setBuiltInVariable(BIVariables);
 									response = manager.accounts().containers().workspaces().builtInVariables().create(newWorkSpaceString).execute();
-									System.out.println( newBIVariable.getName() + "created successfully");
+									System.out.println( newBIVariable.getName() + " created successfully");
 								}
 							}
 							System.out.println("-----------------------------------------------");
@@ -336,9 +338,19 @@ import com.google.gson.JsonObject;
 						CreateContainerVersionRequestVersionOptions options = new  CreateContainerVersionRequestVersionOptions();
 						options.setName("Published Version");
 						options.setNotes("Published Version");
-						CreateContainerVersionResponse response = new CreateContainerVersionResponse();
-						response.setNewWorkspacePath(newWorkSpaceString);
-						ContainerVersion version = response.getContainerVersion();
+						
+						ContainerVersion version = new ContainerVersion();
+						version.setContainer(createdContainer);
+						version.setBuiltInVariable(BIVariables);
+						
+						CreateContainerVersionResponse Create_response = new CreateContainerVersionResponse();
+						Create_response.setNewWorkspacePath(newWorkSpaceString);
+						
+						
+						PublishContainerVersionResponse Publish_response = new PublishContainerVersionResponse();
+						Publish_response.setContainerVersion(version);
+						
+						
 						manager.accounts().containers().versions().publish(newContainer.getPath().toString() + version.getContainerVersionId()).execute();
 						
 						if( version != null )
