@@ -99,7 +99,7 @@ import com.google.gson.JsonObject;
 			      e.printStackTrace();
 			    }
 			  
-			 cloneExampleContainer("Greg_Pina_Test_test", "56800", "GTM-PNJH2T");
+			 cloneExampleContainer("Greg_Pina_Test_test_test", "56800", "GTM-PNJH2T");
 			  
 			}
 
@@ -190,7 +190,6 @@ import com.google.gson.JsonObject;
 							newContainer.setUsageContext(Arrays.asList("web"));
 							newContainer = manager.accounts().containers().create(accountPath, newContainer).execute();
 							System.out.println(containerName + " copied and created successfuly");
-							//System.out.println(newContainer.getPath().toString());
 							Workspace newWS = manager.accounts().containers().workspaces().get(newContainer.getPath().toString()+"/workspaces/1").execute();
 
 							String newWorkSpaceString = newWS.getPath().toString();
@@ -232,11 +231,9 @@ import com.google.gson.JsonObject;
 									Thread.sleep(2000);
 									
 									newBIVariable = BIVariable.clone();
-									newBIVariable.setPath(newWorkSpaceString);
 									
-									List<BuiltInVariable> CreatedBIVariables = manager.accounts().containers().workspaces().builtInVariables().create(newBIVariable.getPath()).execute().getBuiltInVariable();
-									CreateBuiltInVariableResponse BiV_response = new CreateBuiltInVariableResponse();
-									BiV_response.setBuiltInVariable(CreatedBIVariables);
+									List<BuiltInVariable> CreatedBIVariables = manager.accounts().containers().workspaces().builtInVariables().create(newWorkSpaceString).setType(Arrays.asList(BIVariable.getType())).execute().getBuiltInVariable();
+
 									
 									System.out.println( newBIVariable.getName() + " created successfully");
 								}
@@ -349,12 +346,13 @@ import com.google.gson.JsonObject;
 						CreateContainerVersionResponse response = manager.accounts().containers().workspaces().createVersion(newWorkSpaceString, options).execute();
 						
 						ContainerVersion version = response.getContainerVersion();
+						manager.accounts().containers().versions().publish(newWorkSpaceString + "/version/" + version.getContainerVersionId()).execute();
 						
 						if( version != null )
 						{
-							System.out.print("Container Version ID = " + version.getContainerVersionId());
+							System.out.println("Container Version ID = " + version.getContainerVersionId());
 							System.out.println("Container Version Fingerprint = " + version.getFingerprint());
-							manager.accounts().containers().versions().update(newContainer.getPath().toString() + "/version/" + version.getContainerVersionId(), version.setName("Published Version")).execute();
+							manager.accounts().containers().versions().update(newWorkSpaceString + "/version/" + version.getContainerVersionId(), version.setName("Published Version")).execute();
 						}
 						
 						
