@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.apache.*;
@@ -36,6 +37,7 @@ import com.google.api.services.tagmanager.TagManager.Accounts;
 import com.google.api.services.tagmanager.TagManager.Accounts.Containers;
 import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Get;
 import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces;
+import com.google.api.services.tagmanager.TagManager.Accounts.Containers.Workspaces.CreateVersion;
 import com.google.api.services.tagmanager.TagManagerScopes;
 import com.google.api.services.tagmanager.model.*;
 import com.google.api.services.tagmanager.model.Account;
@@ -97,7 +99,7 @@ import com.google.gson.JsonObject;
 			      e.printStackTrace();
 			    }
 			  
-			 cloneExampleContainer("Greg_Pina_Test_new", "56800", "GTM-PNJH2T");
+			 cloneExampleContainer("Greg_Pina_Test_test", "56800", "GTM-PNJH2T");
 			  
 			}
 
@@ -117,6 +119,7 @@ import com.google.gson.JsonObject;
 			}
 
 			
+			@SuppressWarnings({ "unlikely-arg-type", "unchecked" })
 			private static void cloneExampleContainer(String containerName, String accountId, String exampleContainerPublicId) throws IOException
 			{
 				
@@ -203,7 +206,7 @@ import com.google.gson.JsonObject;
 							System.out.println("*** Copying Variables ***");
 							System.out.println();
 						    Variable newVariable = new Variable();
-						    BuiltInVariable newBIVariable = new BuiltInVariable();
+					        BuiltInVariable newBIVariable = new BuiltInVariable();
 						    List<Variable> exampleVariables = manager.accounts().containers().workspaces().variables().list(ExampleWS_String).execute().getVariable();
 							if(exampleVariables != null && !exampleVariables.isEmpty()) 
 							{
@@ -212,30 +215,34 @@ import com.google.gson.JsonObject;
 									Thread.sleep(2000);
 								    newVariable = createdVariable.clone();
 									newVariable.getWorkspaceId();
-									//newVariable.setAccountId(null).setContainerId(null).setFingerprint(null).setVariableId(null);
 									newVariable = manager.accounts().containers().workspaces().variables().create(newWorkSpaceString, newVariable).execute();
 								
 									System.out.println(newVariable.getName() + " created successfuly");
 								}
 							}
 							
+							
 							List<BuiltInVariable> BIVariables = manager.accounts().containers().workspaces().builtInVariables().list(ExampleWS_String).execute().getBuiltInVariable();
-							List<BuiltInVariable> createdBiV = manager.accounts().containers().workspaces().builtInVariables().list(newWorkSpaceString).execute().getBuiltInVariable();
-							if(BIVariables != null && !BIVariables.isEmpty())
+							
+							if(BIVariables != null && !BIVariables.isEmpty() )
 							{
+								
 								for( BuiltInVariable BIVariable : BIVariables)
 								{
 									Thread.sleep(2000);
 									
 									newBIVariable = BIVariable.clone();
-									// where did bi variable response go?
-									CreateBuiltInVariableResponse response = new CreateBuiltInVariableResponse();
+									newBIVariable.setPath(newWorkSpaceString);
 									
-									response.setBuiltInVariable(BIVariables);
-									response = manager.accounts().containers().workspaces().builtInVariables().create(newWorkSpaceString).execute();
+									List<BuiltInVariable> CreatedBIVariables = manager.accounts().containers().workspaces().builtInVariables().create(newBIVariable.getPath()).execute().getBuiltInVariable();
+									CreateBuiltInVariableResponse BiV_response = new CreateBuiltInVariableResponse();
+									BiV_response.setBuiltInVariable(CreatedBIVariables);
+									
 									System.out.println( newBIVariable.getName() + " created successfully");
 								}
 							}
+							
+							
 							System.out.println("-----------------------------------------------");
 							System.out.println();
 							
@@ -339,19 +346,9 @@ import com.google.gson.JsonObject;
 						options.setName("Published Version");
 						options.setNotes("Published Version");
 						
-						ContainerVersion version = new ContainerVersion();
-						version.setContainer(createdContainer);
-						version.setBuiltInVariable(BIVariables);
+						CreateContainerVersionResponse response = manager.accounts().containers().workspaces().createVersion(newWorkSpaceString, options).execute();
 						
-						CreateContainerVersionResponse Create_response = new CreateContainerVersionResponse();
-						Create_response.setNewWorkspacePath(newWorkSpaceString);
-						
-						
-						PublishContainerVersionResponse Publish_response = new PublishContainerVersionResponse();
-						Publish_response.setContainerVersion(version);
-						
-						
-						manager.accounts().containers().versions().publish(newContainer.getPath().toString() + version.getContainerVersionId()).execute();
+						ContainerVersion version = response.getContainerVersion();
 						
 						if( version != null )
 						{
